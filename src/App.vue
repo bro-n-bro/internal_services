@@ -14,7 +14,7 @@
                 </div>
 
                 <div class="icon" v-if="!props.item.type">
-                    <svg><use xlink:href="@/assets/sprite.svg#ic_notification_progress"></use></svg>
+                    <Processing />
                 </div>
 
                 <div v-if="props.item.data.chain && props.item.data.tx_type">
@@ -44,6 +44,9 @@
     import { useRoute } from 'vue-router'
     import { useTitle } from '@vueuse/core'
     import { createKeplrOfflineSinger } from '@/utils'
+
+    // Components
+    import Processing from '@/components/Processing.vue'
 
 
     const store = useGlobalStore(),

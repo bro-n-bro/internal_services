@@ -137,3 +137,10 @@ export const sendTx = async ({ txRaw, client }) => {
 
     return result
 }
+
+
+
+// Get metwork logo
+export const getNetworkLogo = alias => {
+    return require(`@/assets/${alias}_logo.png`)
+}

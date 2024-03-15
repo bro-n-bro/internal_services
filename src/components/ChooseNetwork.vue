@@ -2,7 +2,7 @@
     <div class="choose_network" ref="target">
         <button class="btn" @click.prevent="showDropdown = !showDropdown">
             <div class="logo">
-                <img :src="getLogoSrc(store.networks[store.currentNetwork].alias)" alt="">
+                <img :src="getNetworkLogo(store.networks[store.currentNetwork].alias)" alt="">
             </div>
 
             <div>
@@ -22,7 +22,7 @@
                         @click="showDropdown = !showDropdown"
                     >
                         <div class="logo">
-                            <img :src="getLogoSrc(network.alias)" alt="">
+                            <img :src="getNetworkLogo(network.alias)" alt="">
                         </div>
 
                         <div>
@@ -43,17 +43,12 @@
     import { ref } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { onClickOutside } from '@vueuse/core'
+    import { getNetworkLogo } from '@/utils'
 
 
     const store = useGlobalStore(),
         showDropdown = ref(false),
         target = ref(null)
-
-
-    // Get logo
-    function getLogoSrc(alias) {
-        return require(`@/assets/${alias}_logo.png`)
-    }
 
 
     // Click outside

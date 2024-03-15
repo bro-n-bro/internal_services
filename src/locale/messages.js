@@ -34,6 +34,9 @@ export default {
             'notification_failed_title': 'Transaction failed',
             'notification_explorer_link': 'Explorer',
 
+            'notification_failed_validate_title': 'Validate failed',
+            'notification_failed_validate_desc': 'All fields are required',
+
             'notification_multisend_process': 'Multisend processing...',
             'notification_multisend_success_title': 'Multisend successful',
             'notification_multisend_action': 'Multisend',
