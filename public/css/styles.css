@@ -270,12 +270,22 @@ button
 ------------------*/
 .form
 {
+    transition: opacity .2s linear;
+
     --form_border_color: #191919;
     --form_focus_color: #950fff;
     --form_error_color: #eb5757;
     --form_border_radius: 17px;
     --form_bg_color: #191919;
-    --form_placeholder_color: #fff;
+    --form_placeholder_color: #8e8e8e;
+}
+
+
+.form.processing
+{
+    pointer-events: none;
+
+    opacity: .5;
 }
 
 
@@ -385,6 +395,14 @@ button
 .form .from .input
 {
     text-transform: uppercase;
+}
+
+
+.form .amount .input:disabled
+{
+    pointer-events: none;
+
+    opacity: .5;
 }
 
 

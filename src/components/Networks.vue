@@ -5,7 +5,7 @@
         <div v-for="(network, index) in store.networks" :key="index">
             <router-link :to="`/multisend/${network.alias}`" class="link">
                 <div class="logo">
-                    <img :src="getLogoSrc(network.alias)" alt="">
+                    <img :src="getNetworkLogo(network.alias)" alt="">
                 </div>
 
                 <div>
@@ -20,14 +20,9 @@
 
 <script setup>
     import { useGlobalStore } from '@/stores'
+    import { getNetworkLogo } from '@/utils'
 
     const store = useGlobalStore()
-
-
-    // Get logo
-    function getLogoSrc(alias) {
-        return require(`@/assets/${alias}_logo.png`)
-    }
 </script>
 
 
