@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { createKeplrOfflineSinger, denomTraces } from '@/utils'
+import { createKeplrOfflineSinger, denomTraces, findClosestSubstringInArray } from '@/utils'
 
 // Networks
 import cosmoshub from '@/stores/networks/cosmoshub'
@@ -18,6 +18,7 @@ export const useGlobalStore = defineStore('global', {
         isKeplrConnected: false,
 
         balances: [],
+        skyChartAssets: [],
 
         networks,
 
@@ -39,17 +40,52 @@ export const useGlobalStore = defineStore('global', {
 
 
     actions: {
-        // Currencies price
-        // async getCurrenciesPrice() {
-        //     try {
-        //         // Request
-        //         await fetch('https://rpc.bronbro.io/price_feed_api/tokens/')
-        //             .then(response => response.json())
-        //             .then(data => this.prices = data)
-        //     } catch (error) {
-        //         console.error(error)
-        //     }
-        // },
+        // Get skychart assets
+        async getSkyChartAssets() {
+            try {
+                // Request
+                await fetch('https://skychart.bronbro.io/v1/assets')
+                    .then(response => response.json())
+                    .then(data => this.skyChartAssets = data)
+            } catch (error) {
+                console.error(error)
+            }
+        },
+
+        // Get exponents
+        async getExponents() {
+            try {
+                // Get skychart assets
+                await this.getSkyChartAssets()
+
+                this.balances.forEach(async balance => {
+                    // Find best denom name
+                    balance.best_denom = findClosestSubstringInArray(balance.base_denom, this.skyChartAssets)
+
+                    // Get denom info
+                    try {
+                        // Request
+                        let denomInfo = await fetch(`https://skychart.bronbro.io/v1/asset/${balance.best_denom}`)
+                            .then(response => response.json())
+
+                        // Get exponent
+                        let result = denomInfo.denom_units.find(el => el.denom == balance.best_denom)
+
+                        // Format token exponent
+                        let formatableToken = this.formatableTokens.find(el => el.tokenName == balance.best_denom.toUpperCase())
+
+                        // Set exponent for denom
+                        formatableToken
+                            ? balance.exponent = formatableToken.exponent
+                            : balance.exponent = result.exponent
+                    } catch (error) {
+                        console.error(error)
+                    }
+                })
+            } catch (error) {
+                console.error(error)
+            }
+        },
 
 
         // Init APP
@@ -67,6 +103,9 @@ export const useGlobalStore = defineStore('global', {
 
                     balance.base_denom = result.base_denom
                 }
+
+                // Get exponents
+                await this.getExponents()
             }
         },
 
@@ -77,19 +116,7 @@ export const useGlobalStore = defineStore('global', {
                 // Request
                 await fetch(`${this.networks[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/${this.Keplr.account.address}`)
                     .then(response => response.json())
-                    .then(async response => {
-                        this.balances = response.balances
-
-                        // for (let i = response.balances.length - 1; i >= 0; i--) {
-                        //     // Get denom
-                        //     let denom = await denomTraces(response.balances[i].denom)
-
-                        //     // Only tokens in price feed api
-                        //     if (this.prices.find(el => el.symbol == denom.base_denom.toUpperCase())) {
-                        //         this.balances.push(response.balances[i])
-                        //     }
-                        // }
-                    })
+                    .then(async response => this.balances = response.balances)
             } catch (error) {
                 console.error(error)
             }
