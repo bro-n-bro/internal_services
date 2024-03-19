@@ -125,7 +125,7 @@
         add_amount = ref(1),
         data = reactive([
             {
-                address: 'cosmos1p4hc20yrucx4hk4lf68wmuzvsa0rrxkuczh2ew',
+                address: '',
                 coins: [{
                     amount: '',
                     denom: ''
@@ -292,6 +292,7 @@
     // Delete item
     function deleteItem(itemindex) {
         data.splice(itemindex, 1)
+        placeholders.splice(itemindex, 1)
     }
 
 
@@ -313,6 +314,7 @@
     // Delete coin in item
     function deleteCoinInItem(itemindex, coinIndex) {
         data[itemindex].coins.splice(coinIndex, 1)
+        placeholders[itemindex].coins.splice(coinIndex, 1)
     }
 
 
@@ -386,6 +388,22 @@
                     item.coins.forEach(coin => {
                         // Multiply by the exponent
                         coin.amount = (coin.amount * Math.pow(10, store.balances.find(el => el.denom == coin.denom).exponent)).toString()
+                    })
+                })
+
+
+                // Sort coins
+                inputs[0].coins.sort((a, b) => {
+                    if (a.denom > b.denom) { return 1 }
+                    if (a.denom < b.denom) { return -1 }
+                    return 0
+                })
+
+                outputs.forEach(item => {
+                    item.coins.sort((a, b) => {
+                        if (a.denom > b.denom) { return 1 }
+                        if (a.denom < b.denom) { return -1 }
+                        return 0
                     })
                 })
 
