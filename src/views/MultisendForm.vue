@@ -33,7 +33,7 @@
                     </div>
 
                     <div class="field">
-                        <input type="text" v-model="coin.denom" class="input" @focus.self="showDropdown($event)">
+                        <input type="text" :value="formatTokenName(getBestDenom(coin.denom))" class="input" @focus.self="showDropdown($event)">
 
                         <div class="arr">
                             <svg><use xlink:href="@/assets/sprite.svg#ic_arr_ver"></use></svg>
@@ -43,9 +43,19 @@
                             <div class="scroll">
                                 <div v-for="(balance, balanceIndex) in store.balances" :key="balanceIndex">
                                     <button type="button" class="btn" @click.prevent="setDenom(itemIndex, coinIndex, balance.denom)">
-                                        <div class="denom">{{ formatTokenName(balance.base_denom) }}</div>
+                                        <div class="denom">
+                                            {{ formatTokenName(balance.best_denom) }}
+                                        </div>
 
-                                        <div class="amount">{{ formatTokenAmount(balance.amount, balance.base_denom) }}</div>
+                                        <div class="amount">
+                                            <template v-if="formatTokenAmount(balance.amount, balance.base_denom) < 0.01">
+                                            &lt; 0.01
+                                            </template>
+
+                                            <template v-else>
+                                            {{ $filters.toFixed(formatTokenAmount(balance.amount, balance.base_denom), 2) }}
+                                            </template>
+                                        </div>
                                     </button>
                                 </div>
                             </div>
@@ -59,7 +69,7 @@
                     </div>
 
                     <div class="field">
-                        <input type="text" v-model="coin.amount" class="input" @input="setAmount($event, itemIndex, coinIndex)" :placeholder="coin.placeholder ? coin.placeholder : 0" :disabled="!coin.denom.length">
+                        <input type="text" v-model="coin.amount" class="input" @input="setAmount($event, itemIndex, coinIndex)" :placeholder="placeholders[itemIndex].coins[coinIndex].placeholder" :disabled="!coin.denom.length">
 
                         <button type="button" class="max_btn" @click.prevent="setMaxAmount(itemIndex, coinIndex)" :disabled="!coin.denom.length">
                             {{ $t('message.btn_max') }}
@@ -100,7 +110,7 @@
     import { reactive, ref, onBeforeMount, onMounted, onBeforeUnmount, inject } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { useNotification } from '@kyvg/vue3-notification'
-    import { formatTokenAmount, formatTokenName, prepareTx, sendTx } from '@/utils'
+    import { getBestDenom, formatTokenAmount, formatTokenName, prepareTx, sendTx } from '@/utils'
 
     // Components
     import Loader from '@/components/Loader.vue'
@@ -119,6 +129,13 @@
                 coins: [{
                     amount: '',
                     denom: ''
+                }]
+            },
+        ]),
+        placeholders = reactive([
+            {
+                coins: [{
+                    placeholder: '0'
                 }]
             },
         ])
@@ -165,13 +182,16 @@
         let used = calcTotalUsedCoins(itemindex, coinIndex)
 
         // Set amount
-        if (parseFloat(e.target.value.replace(',', '.')) > (balance.amount - used)) {
-            data[itemindex].coins[coinIndex].amount = (balance.amount - used).toString()
+        if (parseFloat(e.target.value.replace(',', '.')) > formatTokenAmount((balance.amount - used), balance.base_denom)) {
+            data[itemindex].coins[coinIndex].amount = ((formatTokenAmount(balance.amount, balance.base_denom) - used).toFixed(2)).toString()
         }
 
         if (e.target.value < 0) {
             data[itemindex].coins[coinIndex].amount = ''
         }
+
+        // Update placeholders
+        updatePlaceholders()
     }
 
 
@@ -184,7 +204,30 @@
         let used = calcTotalUsedCoins(itemindex, coinIndex)
 
         // Set amount
-        data[itemindex].coins[coinIndex].amount = (balance.amount - used).toString()
+        data[itemindex].coins[coinIndex].amount = ((formatTokenAmount(balance.amount, balance.base_denom) - used).toFixed(2)).toString()
+
+        // Update placeholders
+        updatePlaceholders()
+    }
+
+
+    // Set denom
+    function setDenom(itemindex, coinIndex, denom) {
+        // Coin balance
+        let balance = store.balances.find(el => el.denom == denom)
+
+        // Set data
+        data[itemindex].coins[coinIndex].denom = denom
+        data[itemindex].coins[coinIndex].amount = ''
+
+        // Calc total used coins
+        let used = calcTotalUsedCoins(itemindex, coinIndex)
+
+        // Set placeholder
+        placeholders[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used).toFixed(2)
+
+        // Hide dropdown
+        hideDropdown()
     }
 
 
@@ -195,8 +238,8 @@
         // Calc total used
         data.forEach((item, itemI) => {
             item.coins.forEach((coin, coinI) => {
-                if (itemindex == itemI && coinIndex == coinI) {} else {
-                    if (coin.amount.length) {
+                if (itemindex == itemI && coinIndex == coinI) { } else {
+                    if (coin.denom == data[itemindex].coins[coinIndex].denom && coin.amount.length) {
                         used += parseFloat(coin.amount)
                     }
                 }
@@ -207,32 +250,39 @@
     }
 
 
-    // Set denom
-    function setDenom(itemindex, coinIndex, denom) {
-        // Coin balance
-        let balance = store.balances.find(el => el.denom == denom)
+    // Update placeholders
+    function updatePlaceholders() {
+        placeholders.forEach((item, itemindex) => {
+            item.coins.forEach((coin, coinIndex) => {
+                // Coin balance
+                let balance = store.balances.find(el => el.denom == data[itemindex].coins[coinIndex].denom)
 
-        // Calc total used coins
-        let used = calcTotalUsedCoins(itemindex, coinIndex)
+                // Calc total used coins
+                let used = calcTotalUsedCoins(itemindex, coinIndex)
 
-        // Set data
-        data[itemindex].coins[coinIndex].denom = denom
-        data[itemindex].coins[coinIndex].amount = ''
-        data[itemindex].coins[coinIndex].placeholder = (balance.amount - used)
-
-        // Hide dropdown
-        hideDropdown()
+                // Set placeholder
+                coin.placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used).toFixed(2)
+            })
+        })
     }
 
 
     // Add items
     function addItems() {
         for (var i = 0; i < add_amount.value; i++) {
+            // Push data
             data.push({
                 address: '',
                 coins: [{
                     amount: '',
                     denom: ''
+                }]
+            })
+
+            // Push placeholder
+            placeholders.push({
+                coins: [{
+                    placeholder: '0'
                 }]
             })
         }
@@ -242,14 +292,21 @@
     // Delete item
     function deleteItem(itemindex) {
         data.splice(itemindex, 1)
+        placeholders.splice(itemindex, 1)
     }
 
 
     // Add coin to item
     function addCoinToItem(itemindex) {
+        // Push data
         data[itemindex].coins.push({
             amount: '',
             denom: ''
+        })
+
+        // Push placeholder
+        placeholders[itemindex].coins.push({
+            placeholder: '0'
         })
     }
 
@@ -257,6 +314,7 @@
     // Delete coin in item
     function deleteCoinInItem(itemindex, coinIndex) {
         data[itemindex].coins.splice(coinIndex, 1)
+        placeholders[itemindex].coins.splice(coinIndex, 1)
     }
 
 
@@ -301,7 +359,9 @@
                 let inputs = [{
                     address: store.Keplr.account.address,
                     coins: []
-                }]
+                }],
+                outputs = JSON.parse(JSON.stringify(data))
+
 
                 // Group inputs coins
                 data.forEach(item => {
@@ -311,23 +371,49 @@
 
                         if (duplicateDenom) {
                             // Sum amount for one denom
-                            duplicateDenom.amount = (parseFloat(duplicateDenom.amount) + parseFloat(coin.amount)).toString()
+                            duplicateDenom.amount = (parseFloat(duplicateDenom.amount) + parseFloat(coin.amount) * Math.pow(10, store.balances.find(el => el.denom == coin.denom).exponent)).toString()
                         } else {
                             // Add new coin
                             inputs[0].coins.push({
-                                amount: parseFloat(coin.amount).toString(),
+                                amount: (parseFloat(coin.amount) * Math.pow(10, store.balances.find(el => el.denom == coin.denom).exponent)).toString(),
                                 denom: coin.denom
                             })
                         }
                     })
                 })
 
+
+                // Format coins amount
+                outputs.forEach(item => {
+                    item.coins.forEach(coin => {
+                        // Multiply by the exponent
+                        coin.amount = (coin.amount * Math.pow(10, store.balances.find(el => el.denom == coin.denom).exponent)).toString()
+                    })
+                })
+
+
+                // Sort coins
+                inputs[0].coins.sort((a, b) => {
+                    if (a.denom > b.denom) { return 1 }
+                    if (a.denom < b.denom) { return -1 }
+                    return 0
+                })
+
+                outputs.forEach(item => {
+                    item.coins.sort((a, b) => {
+                        if (a.denom > b.denom) { return 1 }
+                        if (a.denom < b.denom) { return -1 }
+                        return 0
+                    })
+                })
+
+
                 // Message
                 let msgAny = {
                     typeUrl: '/cosmos.bank.v1beta1.MsgMultiSend',
                     value: {
                         inputs,
-                        outputs: data
+                        outputs
                     }
                 }
 
@@ -356,9 +442,7 @@
                     })
 
                     // Reinit APP
-                    if (!store.isKeplrConnected) {
-                        await store.initApp()
-                    }
+                    await store.initApp()
                 } else {
                     // Show error
                     showError(error)

@@ -26,5 +26,20 @@ app.use(Notifications)
 app.provide('i18n', i18n)
 
 
+// Filters
+app.config.globalProperties.$filters = {
+    // Add rounding
+    toFixed(value, limit) {
+        let newValue
+
+        value != 0
+            ? newValue = value.toFixed(limit)
+            : newValue = value
+
+        return newValue
+    }
+}
+
+
 // Mount
 app.mount('#app')

@@ -33,30 +33,47 @@ export const denomTraces = async string => {
 }
 
 
-// Formating token name
-export const formatTokenName = (tokenName) => {
-    let store = useGlobalStore(),
-        newTokenName = ''
+// Get base denom
+export const getBaseDenom = denom => {
+    if (denom) {
+        let store = useGlobalStore(),
+            result = store.balances.find(el => el.denom == denom)
 
-    if (store.formatableTokens.find(el => el.tokenName == tokenName.toUpperCase())) {
-        newTokenName = store.formatableTokens.find(el => el.tokenName == tokenName.toUpperCase()).formatTokenName
+        return result.base_denom
     }
+}
 
-    return newTokenName.length ? newTokenName : tokenName
+
+// Get best denom
+export const getBestDenom = denom => {
+    if (denom) {
+        let store = useGlobalStore(),
+            result = store.balances.find(el => el.denom == denom)
+
+        return result.best_denom
+    }
+}
+
+
+// Formating token name
+export const formatTokenName = tokenName => {
+    if (tokenName) {
+        let store = useGlobalStore(),
+            newTokenName = ''
+
+        if (store.formatableTokens.find(el => el.tokenName == tokenName.toUpperCase())) {
+            newTokenName = store.formatableTokens.find(el => el.tokenName == tokenName.toUpperCase()).formatTokenName
+        }
+
+        return newTokenName.length ? newTokenName : tokenName
+    }
 }
 
 
 // Formating token amount
 export const formatTokenAmount = (amount, tokenName) => {
     let store = useGlobalStore(),
-        formatAmount = 0,
-        formatableToken = store.formatableTokens.find(el => el.tokenName == tokenName.toUpperCase())
-
-    // formatableToken
-    //     ? formatAmount = amount / Math.pow(10, formatableToken.exponent)
-    //     : formatAmount = amount / Math.pow(10, store.prices.find(el => el.symbol == tokenName.toUpperCase()).exponent)
-
-    formatAmount = amount
+        formatAmount = amount / Math.pow(10, store.balances.find(el => el.base_denom == tokenName).exponent)
 
     return formatAmount
 }
@@ -117,7 +134,7 @@ export const prepareTx = async (msg, gasSimulate = true, chain = store.currentNe
     }
 
     // MENO
-    let memo = store.ref ? `bro.${store.ref}` : 'bro.app'
+    let memo = 'bro.multisend'
 
     // Sign transaction
     let txRaw = await client.sign(store.Keplr.account.address, msg, fee, memo)
@@ -143,4 +160,29 @@ export const sendTx = async ({ txRaw, client }) => {
 // Get metwork logo
 export const getNetworkLogo = alias => {
     return require(`@/assets/${alias}_logo.png`)
+}
+
+
+// Find closest substring in array
+export function findClosestSubstringInArray(targetString, array) {
+    let closestMatch = null,
+        closestMatchLength = 0
+
+    // Check each element of the array
+    for (let i = 0; i < array.length; i++) {
+        // Create a regular expression for the current array element
+        const regexString = array[i].split("").join(".*"),
+            regex = new RegExp(regexString.toLowerCase())
+
+        // Look for a match between the current array element and the source string
+        const match = targetString.match(regex)
+
+        // If a match is found and its length is greater than the previous best, update the best result
+        if (match && match[0].length > closestMatchLength) {
+            closestMatch = array[i]
+            closestMatchLength = match[0].length
+        }
+    }
+
+    return closestMatch
 }
