@@ -164,25 +164,94 @@ export const getNetworkLogo = alias => {
 
 
 // Find closest substring in array
+// export function findClosestSubstringInArray(targetString, array) {
+//     let closestMatch = null,
+//         closestMatchLength = 0
+
+//     // Check each element of the array
+//     for (let i = 0; i < array.length; i++) {
+//         // Create a regular expression for the current array element
+//         const regexString = array[i].split("").join(".*"),
+//             regex = new RegExp(regexString.toLowerCase())
+
+//         // Look for a match between the current array element and the source string
+//         const match = targetString.match(regex)
+
+//         // If a match is found and its length is greater than the previous best, update the best result
+//         if (match && match[0].length > closestMatchLength) {
+//             closestMatch = array[i]
+//             closestMatchLength = match[0].length
+//         }
+//     }
+
+//     return closestMatch
+// }
+
+
 export function findClosestSubstringInArray(targetString, array) {
-    let closestMatch = null,
-        closestMatchLength = 0
+    let closestMatch = null
+    let minDistance = Infinity
 
-    // Check each element of the array
-    for (let i = 0; i < array.length; i++) {
-        // Create a regular expression for the current array element
-        const regexString = array[i].split("").join(".*"),
-            regex = new RegExp(regexString.toLowerCase())
+    for (const str of array) {
+        const distance = levenshteinDistance(str.toLowerCase(), targetString.toLowerCase())
 
-        // Look for a match between the current array element and the source string
-        const match = targetString.match(regex)
+        // Если длина разницы между строками равна 1
+        if (Math.abs(str.length - targetString.length) === 1) {
+            // Если разница в одном символе и этот символ не в конце строки
+            for (let i = 0; i < Math.min(str.length, targetString.length); i++) {
+                if (str[i] !== targetString[i]) {
+                    const slicedTarget = targetString.slice(0, i) + targetString.slice(i + 1)
+                    if (str === slicedTarget) {
+                        closestMatch = str
+                        minDistance = distance
+                        break;
+                    }
+                }
+            }
+        }
 
-        // If a match is found and its length is greater than the previous best, update the best result
-        if (match && match[0].length > closestMatchLength) {
-            closestMatch = array[i]
-            closestMatchLength = match[0].length
+        if (distance < minDistance) {
+            closestMatch = str
+            minDistance = distance
         }
     }
 
+    console.log("Наиболее релевантный вариант:", targetString, closestMatch);
+
     return closestMatch
+}
+
+
+
+function levenshteinDistance(s1, s2) {
+    const len1 = s1.length,
+        len2 = s2.length
+
+    const matrix = []
+
+    // Инициализация матрицы
+    for (let i = 0; i <= len1; i++) {
+        matrix[i] = [i]
+    }
+
+    for (let j = 0; j <= len2; j++) {
+        matrix[0][j] = j
+    }
+
+    // Вычисление расстояния Левенштейна
+    for (let j = 1; j <= len2; j++) {
+        for (let i = 1; i <= len1; i++) {
+            if (s1[i - 1] === s2[j - 1]) {
+                matrix[i][j] = matrix[i - 1][j - 1]
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j] + 1
+                )
+            }
+        }
+    }
+
+    return matrix[len1][len2]
 }

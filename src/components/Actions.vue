@@ -1,7 +1,7 @@
 <template>
     <section class="actions">
         <div class="list">
-            <router-link to="/multisend" class="item" :class="{ active: store.currentAction == 'multisend' }">Multisend</router-link>
+            <router-link to="/multisend/cosmoshub" class="item">Multisend</router-link>
         </div>
     </section>
 </template>
@@ -58,7 +58,7 @@
 
 
     .actions .item:hover,
-    .actions .item.active
+    .actions .item.router-link-active
     {
         background: #141414;
     }

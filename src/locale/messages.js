@@ -6,16 +6,12 @@ export default {
             'page_title': 'Bro Inner',
 
 
-            // Multisend
-            'multisend_page_title': 'Multisend',
-
-
             // Networks
             'networks_title': 'Select network',
 
 
             // Multisend form
-            'multisend_form_page_title': 'Multisend in {network}',
+            'multisend_page_title': 'Multisend in {network}',
 
             'multisend_form_to_address_label': 'Address of the recipient',
             'multisend_form_amount_label': 'Amount',
@@ -26,6 +22,7 @@ export default {
             'btn_send': 'Send',
             'btn_max': 'Max',
             'btn_add': 'Add',
+            'btn_confirm': 'Confrim',
 
 
             // Notofications

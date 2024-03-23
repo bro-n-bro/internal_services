@@ -14,17 +14,9 @@ const routes = [
 		}
 	},
     {
-		path: '/multisend',
+		path: '/multisend/:network',
 		name: 'Multisend',
 		component: () => import('../views/Multisend.vue'),
-		meta: {
-			layout: defaultLayout
-		}
-	},
-	{
-		path: '/multisend/:network',
-		name: 'MultisendForm',
-		component: () => import('../views/MultisendForm.vue'),
 		meta: {
 			layout: defaultLayout
 		}

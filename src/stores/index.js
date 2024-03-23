@@ -12,7 +12,6 @@ const networks = {
 export const useGlobalStore = defineStore('global', {
     state: () => ({
         currentNetwork: 'cosmoshub',
-        currentAction: '',
 
         Keplr: {},
         isKeplrConnected: false,
