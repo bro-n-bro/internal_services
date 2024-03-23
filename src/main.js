@@ -4,7 +4,12 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import i18n from './locale'
+import mitt from 'mitt'
 import Notifications from '@kyvg/vue3-notification'
+
+
+// Events
+const emitter = mitt()
 
 
 // Create App
@@ -24,6 +29,7 @@ app.use(Notifications)
 
 // Vue provide
 app.provide('i18n', i18n)
+app.provide('emitter', emitter)
 
 
 // Filters
