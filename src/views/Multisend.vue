@@ -56,6 +56,16 @@
                                             {{ $filters.toFixed(formatTokenAmount(balance.amount, balance.base_denom), 2) }}
                                             </template>
                                         </div>
+
+                                        <div class="price">
+                                            <template v-if="formatTokenAmount(balance.amount, balance.base_denom) * getPriceByDenom(balance.best_denom) < 0.01">
+                                            (&lt; 0.01$)
+                                            </template>
+
+                                            <template v-else>
+                                            ({{ $filters.toFixed(formatTokenAmount(balance.amount, balance.base_denom) * getPriceByDenom(balance.best_denom), 2) }}$)
+                                            </template>
+                                        </div>
                                     </button>
                                 </div>
                             </div>
@@ -114,7 +124,7 @@
     import { reactive, ref, onBeforeMount, onMounted, onBeforeUnmount, inject } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { useNotification } from '@kyvg/vue3-notification'
-    import { getBestDenom, formatTokenAmount, formatTokenName } from '@/utils'
+    import { getBestDenom, formatTokenAmount, formatTokenName, getPriceByDenom } from '@/utils'
 
     // Components
     import Loader from '@/components/Loader.vue'
@@ -156,9 +166,6 @@
 
         // Hide loader
         loading.value = false
-
-
-        console.log(store.balances)
     })
 
 

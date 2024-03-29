@@ -130,7 +130,7 @@ export const prepareTx = async (msg, gasSimulate = true, chain = store.currentNe
             denom: store.networks[chain].denom,
             amount: '0'
         }],
-        gas: gasSimulate ? Math.round(gasUsed * 1.3).toString() : '100000'
+        gas: gasSimulate ? Math.round(gasUsed * 1.3).toString() : '10000'
     }
 
     // MENO
@@ -189,21 +189,21 @@ export const getNetworkLogo = alias => {
 
 
 export function findClosestSubstringInArray(targetString, array) {
-    let closestMatch = null
-    let minDistance = Infinity
+    let closestMatch = null,
+        minDistance = Infinity
 
     for (const str of array) {
         const distance = levenshteinDistance(str.toLowerCase(), targetString.toLowerCase())
 
-        // Если длина разницы между строками равна 1
         if (Math.abs(str.length - targetString.length) === 1) {
-            // Если разница в одном символе и этот символ не в конце строки
             for (let i = 0; i < Math.min(str.length, targetString.length); i++) {
                 if (str[i] !== targetString[i]) {
                     const slicedTarget = targetString.slice(0, i) + targetString.slice(i + 1)
+
                     if (str === slicedTarget) {
                         closestMatch = str
                         minDistance = distance
+
                         break;
                     }
                 }
@@ -215,8 +215,6 @@ export function findClosestSubstringInArray(targetString, array) {
             minDistance = distance
         }
     }
-
-    console.log("Наиболее релевантный вариант:", targetString, closestMatch);
 
     return closestMatch
 }
@@ -254,4 +252,20 @@ function levenshteinDistance(s1, s2) {
     }
 
     return matrix[len1][len2]
+}
+
+
+
+// Get price by denom
+export const getPriceByDenom = denom => {
+    let store = useGlobalStore(),
+        item = store.prices.find(el => el.symbol == denom.toUpperCase())
+
+        console.log(item)
+
+    if (item) {
+        return item.price
+    } else {
+        return 0
+    }
 }
