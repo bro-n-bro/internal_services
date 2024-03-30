@@ -18,7 +18,7 @@ export const useGlobalStore = defineStore('global', {
         Keplr: {},
         isKeplrConnected: false,
 
-        prices: [],
+        prices: {},
         balances: [],
         skyChartAssets: [],
 
@@ -69,9 +69,11 @@ export const useGlobalStore = defineStore('global', {
         async getExponents() {
             try {
                 // Get skychart assets
-                await this.getSkyChartAssets()
+                if (!this.skyChartAssets.length) {
+                    await this.getSkyChartAssets()
+                }
 
-                // Get skychart assets
+                // Get currencies price
                 await this.getCurrenciesPrice()
 
                 this.balances.forEach(async balance => {

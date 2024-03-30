@@ -121,7 +121,7 @@
 
 
 <script setup>
-    import { reactive, ref, onBeforeMount, onMounted, onBeforeUnmount, inject } from 'vue'
+    import { reactive, ref, onBeforeMount, onMounted, onBeforeUnmount, inject, watch, computed } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { useNotification } from '@kyvg/vue3-notification'
     import { getBestDenom, formatTokenAmount, formatTokenName, getPriceByDenom } from '@/utils'
@@ -139,7 +139,42 @@
         loading = ref(true),
         processing = ref(false),
         add_amount = ref(1),
-        showConfirmModal = ref(false),
+        showConfirmModal = ref(false)
+
+    var data = reactive([
+        {
+            address: '',
+            coins: [{
+                amount: '',
+                denom: ''
+            }]
+        },
+    ]),
+    placeholders = reactive([
+        {
+            coins: [{
+                placeholder: '0'
+            }]
+        },
+    ])
+
+
+    onBeforeMount(async () => {
+        // Init APP
+        if (!store.isKeplrConnected) {
+            await store.initApp()
+        }
+
+        // Hide loader
+        loading.value = false
+    })
+
+
+    watch(computed(() => store.currentNetwork), async () => {
+        // Show loader
+        loading.value = true
+
+        // Clear data
         data = reactive([
             {
                 address: '',
@@ -148,7 +183,8 @@
                     denom: ''
                 }]
             },
-        ]),
+        ])
+
         placeholders = reactive([
             {
                 coins: [{
@@ -157,12 +193,8 @@
             },
         ])
 
-
-    onBeforeMount(async () => {
-        // Init APP
-        if (!store.isKeplrConnected) {
-            await store.initApp()
-        }
+        // Reinit APP
+        await store.initApp()
 
         // Hide loader
         loading.value = false

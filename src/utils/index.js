@@ -21,10 +21,12 @@ export const denomTraces = async string => {
             // Request
             await fetch(`${store.networks[store.currentNetwork].lcd_api}/ibc/apps/transfer/v1/denom_traces/${hash[1]}`)
                 .then(response => response.json())
-                .then(response => result =  response.denom_trace)
+                .then(response => result = response.denom_trace)
         } catch (error) {
             console.error(error)
         }
+    } else if (hash[0] == 'factory') {
+        result.base_denom = hash[2]
     } else {
         result.base_denom = string
     }
@@ -103,7 +105,7 @@ export const createKeplrOfflineSinger = async chainId => {
 
 
 // Prepare Tx
-export const prepareTx = async (msg, gasSimulate = true, chain = store.currentNetwork) => {
+export const prepareTx = async (msg, gasSimulate, chain) => {
     let store = useGlobalStore(),
         gasUsed = 0
 
@@ -130,7 +132,7 @@ export const prepareTx = async (msg, gasSimulate = true, chain = store.currentNe
             denom: store.networks[chain].denom,
             amount: '0'
         }],
-        gas: gasSimulate ? Math.round(gasUsed * 1.3).toString() : '10000'
+        gas: gasSimulate ? Math.round(gasUsed * 1.3).toString() : '1000000'
     }
 
     // MENO
@@ -164,30 +166,6 @@ export const getNetworkLogo = alias => {
 
 
 // Find closest substring in array
-// export function findClosestSubstringInArray(targetString, array) {
-//     let closestMatch = null,
-//         closestMatchLength = 0
-
-//     // Check each element of the array
-//     for (let i = 0; i < array.length; i++) {
-//         // Create a regular expression for the current array element
-//         const regexString = array[i].split("").join(".*"),
-//             regex = new RegExp(regexString.toLowerCase())
-
-//         // Look for a match between the current array element and the source string
-//         const match = targetString.match(regex)
-
-//         // If a match is found and its length is greater than the previous best, update the best result
-//         if (match && match[0].length > closestMatchLength) {
-//             closestMatch = array[i]
-//             closestMatchLength = match[0].length
-//         }
-//     }
-
-//     return closestMatch
-// }
-
-
 export function findClosestSubstringInArray(targetString, array) {
     let closestMatch = null,
         minDistance = Infinity
@@ -221,14 +199,14 @@ export function findClosestSubstringInArray(targetString, array) {
 
 
 
+// Levenshtein distance
 function levenshteinDistance(s1, s2) {
     const len1 = s1.length,
         len2 = s2.length
 
     const matrix = []
 
-    // Инициализация матрицы
-    for (let i = 0; i <= len1; i++) {
+     for (let i = 0; i <= len1; i++) {
         matrix[i] = [i]
     }
 
@@ -236,7 +214,6 @@ function levenshteinDistance(s1, s2) {
         matrix[0][j] = j
     }
 
-    // Вычисление расстояния Левенштейна
     for (let j = 1; j <= len2; j++) {
         for (let i = 1; i <= len1; i++) {
             if (s1[i - 1] === s2[j - 1]) {
@@ -259,13 +236,12 @@ function levenshteinDistance(s1, s2) {
 // Get price by denom
 export const getPriceByDenom = denom => {
     let store = useGlobalStore(),
+        price = 0,
         item = store.prices.find(el => el.symbol == denom.toUpperCase())
 
-        console.log(item)
-
     if (item) {
-        return item.price
-    } else {
-        return 0
+        price = item.price
     }
+
+    return price
 }
