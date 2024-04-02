@@ -505,7 +505,7 @@
         margin-top: 20px;
         padding-top: 40px;
 
-        border-top: 1px dashed rgba(255,255,255,.2);
+        border-top: 1px solid rgba(255,255,255,.2);
     }
 
 

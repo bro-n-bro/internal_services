@@ -3,7 +3,7 @@ export default {
     en: {
         message: {
             // Page title
-            'page_title': 'Bro Inner',
+            'page_title': 'Bro services',
 
 
             // Networks
