@@ -458,6 +458,19 @@
     }
 
 
+    // Event "updateBalances"
+    emitter.on('updateBalances', async () => {
+        // Show loader
+        loading.value = true
+
+        // Reinit APP
+        await store.initApp()
+
+        // Hide loader
+        loading.value = false
+    })
+
+
     // Event "closeMultisendConfirmModal"
     emitter.on('closeMultisendConfirmModal', ({ status }) => {
         // Show confirm modal

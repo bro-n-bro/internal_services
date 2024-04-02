@@ -150,12 +150,12 @@
                     data: {
                         chain: store.networks[store.currentNetwork].name,
                         tx_type: i18n.global.t('message.notification_multisend_action'),
-                        tx_hash: result.transactionHash
+                        tx_hash: store.networks[store.currentNetwork].prefix != 'bostrom' ? result.transactionHash : null
                     }
                 })
 
-                // Reinit APP
-                await store.initApp()
+                // Send "updateBalances" event
+                emitter.emit('updateBalances')
             } else {
                 // Show error
                 showError(error)

@@ -4,10 +4,12 @@ import { createKeplrOfflineSinger, denomTraces, findClosestSubstringInArray } fr
 // Networks
 import cosmoshub from '@/stores/networks/cosmoshub'
 import osmosis from '@/stores/networks/osmosis'
+import bostrom from '@/stores/networks/bostrom'
 
 const networks = {
     cosmoshub,
-    osmosis
+    osmosis,
+    bostrom
 }
 
 
