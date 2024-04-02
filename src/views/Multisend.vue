@@ -231,7 +231,7 @@
         let used = calcTotalUsedCoins(itemindex, coinIndex)
 
         // Set amount
-        if (parseFloat(e.target.value.replace(',', '.')) > formatTokenAmount((balance.amount - used), balance.base_denom)) {
+        if (parseFloat(e.target.value.replace(',', '.')) > formatTokenAmount(balance.amount - used, balance.base_denom)) {
             data[itemindex].coins[coinIndex].amount = (formatTokenAmount(balance.amount, balance.base_denom) - used).toString()
         }
 
@@ -273,7 +273,7 @@
         let used = calcTotalUsedCoins(itemindex, coinIndex)
 
         // Set placeholder
-        placeholders[itemindex].coins[coinIndex].placeholder = formatTokenAmount(balance.amount, balance.base_denom) - used
+        placeholders[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used)
 
         // Hide dropdown
         hideDropdown()
@@ -313,7 +313,7 @@
                 let used = calcTotalUsedCoins(itemindex, coinIndex)
 
                 // Set placeholder
-                placeholders[itemindex].coins[coinIndex].placeholder = formatTokenAmount(balance.amount, balance.base_denom) - used
+                placeholders[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used)
             })
         })
     }
