@@ -574,6 +574,14 @@ button
 }
 
 
+.form .dropdown .btn .price
+{
+    font-size: 11px;
+
+    margin-left: 8px;
+}
+
+
 .form .dropdown .btn:hover,
 .form .dropdown .btn.active
 {

@@ -3,9 +3,13 @@ import { createKeplrOfflineSinger, denomTraces, findClosestSubstringInArray } fr
 
 // Networks
 import cosmoshub from '@/stores/networks/cosmoshub'
+import osmosis from '@/stores/networks/osmosis'
+import bostrom from '@/stores/networks/bostrom'
 
 const networks = {
-    cosmoshub
+    cosmoshub,
+    osmosis,
+    bostrom
 }
 
 
@@ -16,6 +20,7 @@ export const useGlobalStore = defineStore('global', {
         Keplr: {},
         isKeplrConnected: false,
 
+        prices: {},
         balances: [],
         skyChartAssets: [],
 
@@ -39,6 +44,17 @@ export const useGlobalStore = defineStore('global', {
 
 
     actions: {
+        // Currencies price
+        async getCurrenciesPrice() {
+            try {
+                await fetch('https://rpc.bronbro.io/price_feed_api/tokens/')
+                    .then(response => response.json())
+                    .then(data => this.prices = data)
+            } catch (error) {
+                console.error(error)
+            }
+        },
+
         // Get skychart assets
         async getSkyChartAssets() {
             try {
@@ -55,7 +71,12 @@ export const useGlobalStore = defineStore('global', {
         async getExponents() {
             try {
                 // Get skychart assets
-                await this.getSkyChartAssets()
+                if (!this.skyChartAssets.length) {
+                    await this.getSkyChartAssets()
+                }
+
+                // Get currencies price
+                await this.getCurrenciesPrice()
 
                 this.balances.forEach(async balance => {
                     // Find best denom name

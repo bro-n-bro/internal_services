@@ -56,6 +56,16 @@
                                             {{ $filters.toFixed(formatTokenAmount(balance.amount, balance.base_denom), 2) }}
                                             </template>
                                         </div>
+
+                                        <div class="price">
+                                            <template v-if="formatTokenAmount(balance.amount, balance.base_denom) * getPriceByDenom(balance.best_denom) < 0.01">
+                                            (&lt; 0.01$)
+                                            </template>
+
+                                            <template v-else>
+                                            ({{ $filters.toFixed(formatTokenAmount(balance.amount, balance.base_denom) * getPriceByDenom(balance.best_denom), 2) }}$)
+                                            </template>
+                                        </div>
                                     </button>
                                 </div>
                             </div>
@@ -111,10 +121,10 @@
 
 
 <script setup>
-    import { reactive, ref, onBeforeMount, onMounted, onBeforeUnmount, inject } from 'vue'
+    import { reactive, ref, onBeforeMount, onMounted, onBeforeUnmount, inject, watch, computed } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { useNotification } from '@kyvg/vue3-notification'
-    import { getBestDenom, formatTokenAmount, formatTokenName } from '@/utils'
+    import { getBestDenom, formatTokenAmount, formatTokenName, getPriceByDenom } from '@/utils'
 
     // Components
     import Loader from '@/components/Loader.vue'
@@ -129,7 +139,42 @@
         loading = ref(true),
         processing = ref(false),
         add_amount = ref(1),
-        showConfirmModal = ref(false),
+        showConfirmModal = ref(false)
+
+    var data = reactive([
+        {
+            address: '',
+            coins: [{
+                amount: '',
+                denom: ''
+            }]
+        },
+    ]),
+    placeholders = reactive([
+        {
+            coins: [{
+                placeholder: '0'
+            }]
+        },
+    ])
+
+
+    onBeforeMount(async () => {
+        // Init APP
+        if (!store.isKeplrConnected) {
+            await store.initApp()
+        }
+
+        // Hide loader
+        loading.value = false
+    })
+
+
+    watch(computed(() => store.currentNetwork), async () => {
+        // Show loader
+        loading.value = true
+
+        // Clear data
         data = reactive([
             {
                 address: '',
@@ -138,7 +183,8 @@
                     denom: ''
                 }]
             },
-        ]),
+        ])
+
         placeholders = reactive([
             {
                 coins: [{
@@ -147,12 +193,8 @@
             },
         ])
 
-
-    onBeforeMount(async () => {
-        // Init APP
-        if (!store.isKeplrConnected) {
-            await store.initApp()
-        }
+        // Reinit APP
+        await store.initApp()
 
         // Hide loader
         loading.value = false
@@ -231,7 +273,7 @@
         let used = calcTotalUsedCoins(itemindex, coinIndex)
 
         // Set placeholder
-        placeholders[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used).toString()
+        placeholders[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used)
 
         // Hide dropdown
         hideDropdown()
@@ -271,7 +313,7 @@
                 let used = calcTotalUsedCoins(itemindex, coinIndex)
 
                 // Set placeholder
-                placeholders[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used).toString()
+                placeholders[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used)
             })
         })
     }
@@ -414,6 +456,19 @@
 
         return result
     }
+
+
+    // Event "updateBalances"
+    emitter.on('updateBalances', async () => {
+        // Show loader
+        loading.value = true
+
+        // Reinit APP
+        await store.initApp()
+
+        // Hide loader
+        loading.value = false
+    })
 
 
     // Event "closeMultisendConfirmModal"
