@@ -136,6 +136,8 @@
             // Send Tx
             let result = await sendTx(prepareResult)
 
+            console.log(result)
+
             if (result.code === 0) {
                 // Show notification
                 notification.notify({

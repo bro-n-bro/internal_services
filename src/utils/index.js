@@ -132,7 +132,7 @@ export const prepareTx = async (msg, gasSimulate, chain) => {
             denom: store.networks[chain].denom,
             amount: '0'
         }],
-        gas: gasSimulate ? Math.round(gasUsed * 1.3).toString() : '1000000'
+        gas: gasSimulate ? Math.round(gasUsed * 1.5).toString() : '1000000'
     }
 
     // MENO
