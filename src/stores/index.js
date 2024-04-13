@@ -86,7 +86,7 @@ export const useGlobalStore = defineStore('global', {
 
             try {
                 // Request
-                await fetch(`${this.networks[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/bostrom1ke7kxdn29w2lrxt9dzusa6shvmwd8xm9gxm2zf`)
+                await fetch(`${this.networks[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/${this.Keplr.account.address}`)
                     .then(response => response.json())
                     .then(async response => this.balances = response.balances)
             } catch (error) {
