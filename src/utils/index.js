@@ -1,7 +1,8 @@
 import { useGlobalStore } from '@/stores'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
-import { SigningStargateClient } from '@cosmjs/stargate'
+import { GasPrice, SigningStargateClient } from '@cosmjs/stargate'
 import { fromBech32, toBech32 } from '@cosmjs/encoding'
+import { Decimal } from '@cosmjs/math'
 
 
 // Generate address
@@ -26,7 +27,8 @@ export const denomTraces = async string => {
             console.error(error)
         }
     } else if (hash[0] == 'factory') {
-        result.base_denom = hash[2]
+        result.ingnoreTraces = true
+        result.base_denom = hash[hash.length - 1]
     } else {
         result.base_denom = string
     }
@@ -35,39 +37,18 @@ export const denomTraces = async string => {
 }
 
 
-// Get base denom
-export const getBaseDenom = denom => {
-    if (denom) {
-        let store = useGlobalStore(),
-            result = store.balances.find(el => el.denom == denom)
-
-        return result.base_denom
-    }
-}
-
-
-// Get best denom
-export const getBestDenom = denom => {
-    if (denom) {
-        let store = useGlobalStore(),
-            result = store.balances.find(el => el.denom == denom)
-
-        return result.best_denom
-    }
-}
-
-
 // Formating token name
 export const formatTokenName = tokenName => {
     if (tokenName) {
         let store = useGlobalStore(),
-            newTokenName = ''
+            newTokenName = '',
+            symbol = store.balances.find(el => el.denom == tokenName).symbol
 
-        if (store.formatableTokens.find(el => el.tokenName == tokenName.toUpperCase())) {
-            newTokenName = store.formatableTokens.find(el => el.tokenName == tokenName.toUpperCase()).formatTokenName
+        if (store.formatableTokens.find(el => el.tokenName == symbol.toUpperCase())) {
+            newTokenName = store.formatableTokens.find(el => el.tokenName == symbol.toUpperCase()).formatTokenName
         }
 
-        return newTokenName.length ? newTokenName : tokenName
+        return newTokenName.length ? newTokenName : symbol
     }
 }
 
@@ -85,17 +66,27 @@ export const formatTokenAmount = (amount, tokenName) => {
 export const createKeplrOfflineSinger = async chainId => {
     let store = useGlobalStore()
 
+    window.keplr.defaultOptions = {
+        sign: {
+            preferNoSetFee: true
+        }
+    }
+
     // Get Keplr network enable
     await window.keplr.enable(chainId)
 
     // Set Offline Singer
     store.Keplr.offlineSinger = await window.getOfflineSignerAuto(chainId)
 
+    Object.assign(store.Keplr.offlineSinger, {
+        signAmino: store.Keplr.offlineSinger.signAmino ?? store.Keplr.offlineSinger.sign
+    })
+
     // Set Keplr account
     let accounts = await store.Keplr.offlineSinger.getAccounts()
     store.Keplr.account = accounts[0]
 
-    // Set Keplr key~
+    // Set Keplr key
     store.Keplr.key = await window.keplr.getKey(chainId)
 
     // Set Keplr connected status
@@ -104,12 +95,11 @@ export const createKeplrOfflineSinger = async chainId => {
 
 
 
-// Prepare Tx
-export const prepareTx = async (msg, gasSimulate, chain) => {
-    let store = useGlobalStore(),
-        gasUsed = 0
+// Send Tx
+export const sendTx = async (msg, chain) => {
+    let store = useGlobalStore()
 
-    // Create request
+    // Create signer
     let offlineSigner = await window.getOfflineSignerAuto(store.networks[chain].chainId)
 
     Object.assign(offlineSigner, {
@@ -119,40 +109,24 @@ export const prepareTx = async (msg, gasSimulate, chain) => {
     // RPC endpoint
     let rpcEndpoint = store.networks[chain].rpc_api
 
+    // Fee currencies
+    let chainInfos = await window.keplr.getChainInfosWithoutEndpoints(),
+        chainInfo = chainInfos.find(item => item.chainId === store.networks[chain].chainId),
+        feeCurrencies = chainInfo.feeCurrencies[0]
+
+    // Gas price
+    let gasPrice = new GasPrice(Decimal.fromUserInput(feeCurrencies.gasPriceStep?.average.toString() || '0', 3), feeCurrencies?.coinMinimalDenom)
+
     // Client
-    let client = await SigningStargateClient.connectWithSigner(rpcEndpoint, offlineSigner)
-
-    // Simulate gas
-    if (gasSimulate) {
-        gasUsed = await client.simulate(store.Keplr.account.address, msg)
-    }
-
-    let fee = {
-        amount: [{
-            denom: store.networks[chain].denom,
-            amount: '0'
-        }],
-        gas: gasSimulate ? Math.round(gasUsed * 1.5).toString() : '1000000'
-    }
+    let client = await SigningStargateClient.connectWithSigner(rpcEndpoint, offlineSigner, {
+        gasPrice
+    })
 
     // MENO
     let memo = 'bro.multisend'
 
     // Sign transaction
-    let txRaw = await client.sign(store.Keplr.account.address, msg, fee, memo)
-
-    return { txRaw, client }
-}
-
-
-
-// Send Tx
-export const sendTx = async ({ txRaw, client }) => {
-    // Encode TxRaw
-    let txBytes = TxRaw.encode(txRaw).finish()
-
-    // Broadcast Tx
-    let result = await client.broadcastTx(txBytes, client.broadcastTimeoutMs, client.broadcastPollIntervalMs)
+    let result = await client.signAndBroadcast(store.Keplr.account.address, msg, 'auto', memo)
 
     return result
 }
@@ -236,11 +210,14 @@ function levenshteinDistance(s1, s2) {
 // Get price by denom
 export const getPriceByDenom = denom => {
     let store = useGlobalStore(),
-        price = 0,
-        item = store.prices.find(el => el.symbol == denom.toUpperCase())
+        price = 0
 
-    if (item) {
-        price = item.price
+    if (denom) {
+        let item = store.prices.find(el => el.symbol == denom.toUpperCase())
+
+        if (item) {
+            price = item.price
+        }
     }
 
     return price

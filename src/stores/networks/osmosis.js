@@ -7,6 +7,7 @@ const network = {
     token_name: 'OSMO',
     chainId: 'osmosis-1',
     prefix: 'osmo',
+    mintscanPrefix: 'osmosis',
     alias: 'osmosis',
     exponent: 6,
 }

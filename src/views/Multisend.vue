@@ -33,7 +33,7 @@
                     </div>
 
                     <div class="field">
-                        <input type="text" :value="formatTokenName(getBestDenom(coin.denom))" class="input" @focus.self="showDropdown($event)">
+                        <input type="text" :value="formatTokenName(coin.denom)" class="input" @focus.self="showDropdown($event)">
 
                         <div class="arr">
                             <svg><use xlink:href="@/assets/sprite.svg#ic_arr_ver"></use></svg>
@@ -44,7 +44,7 @@
                                 <div v-for="(balance, balanceIndex) in store.balances" :key="balanceIndex">
                                     <button type="button" class="btn" @click.prevent="setDenom($event, itemIndex, coinIndex, balance.denom)">
                                         <div class="denom">
-                                            {{ formatTokenName(balance.best_denom) }}
+                                            {{ formatTokenName(balance.denom) }}
                                         </div>
 
                                         <div class="amount">
@@ -58,12 +58,12 @@
                                         </div>
 
                                         <div class="price">
-                                            <template v-if="formatTokenAmount(balance.amount, balance.base_denom) * getPriceByDenom(balance.best_denom) < 0.01">
+                                            <template v-if="formatTokenAmount(balance.amount, balance.base_denom) * getPriceByDenom(balance.symbol) < 0.01">
                                             (&lt; 0.01$)
                                             </template>
 
                                             <template v-else>
-                                            ({{ $filters.toFixed(formatTokenAmount(balance.amount, balance.base_denom) * getPriceByDenom(balance.best_denom), 2) }}$)
+                                            ({{ $filters.toFixed(formatTokenAmount(balance.amount, balance.base_denom) * getPriceByDenom(balance.symbol), 2) }}$)
                                             </template>
                                         </div>
                                     </button>
@@ -124,7 +124,7 @@
     import { reactive, ref, onBeforeMount, onMounted, onBeforeUnmount, inject, watch, computed } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { useNotification } from '@kyvg/vue3-notification'
-    import { getBestDenom, formatTokenAmount, formatTokenName, getPriceByDenom } from '@/utils'
+    import { formatTokenAmount, formatTokenName, getPriceByDenom } from '@/utils'
 
     // Components
     import Loader from '@/components/Loader.vue'
