@@ -58,12 +58,12 @@
                                         </div>
 
                                         <div class="price">
-                                            <template v-if="formatTokenAmount(balance.amount, balance.base_denom) * getPriceByDenom(balance.symbol) < 0.01">
+                                            <template v-if="balance.cost < 0.01">
                                             (&lt; 0.01$)
                                             </template>
 
                                             <template v-else>
-                                            ({{ $filters.toFixed(formatTokenAmount(balance.amount, balance.base_denom) * getPriceByDenom(balance.symbol), 2) }}$)
+                                            ({{ $filters.toFixed(balance.cost, 2) }}$)
                                             </template>
                                         </div>
                                     </button>
@@ -124,7 +124,7 @@
     import { reactive, ref, onBeforeMount, onMounted, onBeforeUnmount, inject, watch, computed } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { useNotification } from '@kyvg/vue3-notification'
-    import { formatTokenAmount, formatTokenName, getPriceByDenom } from '@/utils'
+    import { formatTokenAmount, formatTokenName } from '@/utils'
 
     // Components
     import Loader from '@/components/Loader.vue'

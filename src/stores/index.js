@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
-import { createKeplrOfflineSinger, denomTraces, findClosestSubstringInArray } from '@/utils'
+import { createKeplrOfflineSinger, denomTraces } from '@/utils'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { assets } from 'chain-registry'
+import { getPriceByDenom, formatTokenAmount } from '@/utils'
 
 // Networks
 import cosmoshub from '@/stores/networks/cosmoshub'
@@ -82,16 +83,16 @@ export const useGlobalStore = defineStore('global', {
         // Get balances
         async getBalances() {
             // Request
-            // this.balances = await this.stargateClient.getAllBalances(this.Keplr.account.address)
+            this.balances = await this.stargateClient.getAllBalances(this.Keplr.account.address)
 
-            try {
-                // Request
-                await fetch(`${this.networks[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/${this.Keplr.account.address}`)
-                    .then(response => response.json())
-                    .then(async response => this.balances = response.balances)
-            } catch (error) {
-                console.error(error)
-            }
+            // try {
+            //     // Request
+            //     await fetch(`${this.networks[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/${this.Keplr.account.address}`)
+            //         .then(response => response.json())
+            //         .then(async response => this.balances = response.balances)
+            // } catch (error) {
+            //     console.error(error)
+            // }
 
             // Get balance info
             for (const balance of this.balances) {
@@ -117,14 +118,16 @@ export const useGlobalStore = defineStore('global', {
                         }
                     })
                 } else {
-                    // Get denom info by skychart
+                    // Get denom info by chain-registry assets
                     try {
-                        // Request
-                        let denomInfo = await fetch(`https://skychart.bronbro.io/v1/asset/${denomTracesResult.base_denom}`)
-                            .then(response => response.json())
+                        // Get chain info
+                        let chainInfo = assets.find(({chain_name}) => chain_name === this.networks[this.currentNetwork].alias)
+
+                        // Get denom info
+                        let denomInfo = chainInfo.assets.find(({base}) => base === balance.denom)
 
                         // Set info
-                        balance.base_denom = denomInfo.base_denom
+                        balance.base_denom = denomTracesResult.base_denom
                         balance.symbol = denomInfo.symbol
 
                         // Format token exponent
@@ -138,10 +141,21 @@ export const useGlobalStore = defineStore('global', {
                         console.error(error)
                     }
                 }
+
+                // Get prices
+                balance.price = getPriceByDenom(balance.symbol)
+                balance.cost = formatTokenAmount(balance.amount, balance.base_denom) * balance.price
             }
 
             // Clear balances
             this.balances = this.balances.filter(obj => obj.hasOwnProperty('exponent'))
+
+            // Sort by "cost"
+            this.balances.sort((a, b) => {
+                if (a.cost > b.cost) { return -1 }
+                if (a.cost < b.cost) { return 1 }
+                return 0
+            })
         },
     }
 })
