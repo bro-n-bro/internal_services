@@ -27,7 +27,7 @@
                 <div class="text" v-html="props.item.text" v-if="props.item.text"></div>
 
                 <div class="explorer" v-if="props.item.data.tx_hash">
-                    <a :href="`https://www.mintscan.io/${store.networks[store.currentNetwork].alias}/txs/${props.item.data.tx_hash}`" target="_blank" rel="noopener nofollow">
+                    <a :href="`https://www.mintscan.io/${store.networks[store.currentNetwork].mintscanPrefix}/txs/${props.item.data.tx_hash}`" target="_blank" rel="noopener nofollow">
                         <span>{{ $t('message.notification_explorer_link') }}</span>
                         <svg><use xlink:href="@/assets/sprite.svg#ic_link_arrow"></use></svg>
                     </a>

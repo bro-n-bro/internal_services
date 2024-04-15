@@ -1,5 +1,8 @@
 import { defineStore } from 'pinia'
-import { createKeplrOfflineSinger, denomTraces, findClosestSubstringInArray } from '@/utils'
+import { createKeplrOfflineSinger, denomTraces } from '@/utils'
+import { SigningStargateClient } from '@cosmjs/stargate'
+import { assets } from 'chain-registry'
+import { getPriceByDenom, formatTokenAmount } from '@/utils'
 
 // Networks
 import cosmoshub from '@/stores/networks/cosmoshub'
@@ -18,15 +21,13 @@ export const useGlobalStore = defineStore('global', {
         currentNetwork: 'cosmoshub',
 
         Keplr: {},
+        stargateClient: {},
         isKeplrConnected: false,
 
-        prices: {},
+        prices: [],
         balances: [],
-        skyChartAssets: [],
 
         networks,
-
-        prices: null,
 
         formatableTokens: [
             {
@@ -37,6 +38,11 @@ export const useGlobalStore = defineStore('global', {
             {
                 tokenName: 'HYDROGEN',
                 formatTokenName: 'MHYDROGEN',
+                exponent: 6
+            },
+            {
+                tokenName: 'TOCYB',
+                formatTokenName: 'MTOCYB',
                 exponent: 6
             }
         ],
@@ -55,58 +61,6 @@ export const useGlobalStore = defineStore('global', {
             }
         },
 
-        // Get skychart assets
-        async getSkyChartAssets() {
-            try {
-                // Request
-                await fetch('https://skychart.bronbro.io/v1/assets')
-                    .then(response => response.json())
-                    .then(data => this.skyChartAssets = data)
-            } catch (error) {
-                console.error(error)
-            }
-        },
-
-        // Get exponents
-        async getExponents() {
-            try {
-                // Get skychart assets
-                if (!this.skyChartAssets.length) {
-                    await this.getSkyChartAssets()
-                }
-
-                // Get currencies price
-                await this.getCurrenciesPrice()
-
-                this.balances.forEach(async balance => {
-                    // Find best denom name
-                    balance.best_denom = findClosestSubstringInArray(balance.base_denom, this.skyChartAssets)
-
-                    // Get denom info
-                    try {
-                        // Request
-                        let denomInfo = await fetch(`https://skychart.bronbro.io/v1/asset/${balance.best_denom}`)
-                            .then(response => response.json())
-
-                        // Get exponent
-                        let result = denomInfo.denom_units.find(el => el.denom == balance.best_denom)
-
-                        // Format token exponent
-                        let formatableToken = this.formatableTokens.find(el => el.tokenName == balance.best_denom.toUpperCase())
-
-                        // Set exponent for denom
-                        formatableToken
-                            ? balance.exponent = formatableToken.exponent
-                            : balance.exponent = result.exponent
-                    } catch (error) {
-                        console.error(error)
-                    }
-                })
-            } catch (error) {
-                console.error(error)
-            }
-        },
-
 
         // Init APP
         async initApp() {
@@ -114,32 +68,94 @@ export const useGlobalStore = defineStore('global', {
                 // Keplr connect
                 await createKeplrOfflineSinger(this.networks[this.currentNetwork].chainId)
 
-                // Get network balance
-                await this.getNetworkBalance()
+                // Stargate client
+                this.stargateClient = await SigningStargateClient.connectWithSigner(this.networks[this.currentNetwork].rpc_api, this.Keplr.offlineSinger)
 
-                // Get formated balances
-                for (const balance of this.balances) {
-                    let result = await denomTraces(balance.denom)
+                // Get currencies price
+                await this.getCurrenciesPrice()
 
-                    balance.base_denom = result.base_denom
-                }
-
-                // Get exponents
-                await this.getExponents()
+                // Get balances
+                await this.getBalances()
             }
         },
 
 
-        // Get network balance
-        async getNetworkBalance() {
-            try {
-                // Request
-                await fetch(`${this.networks[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/${this.Keplr.account.address}`)
-                    .then(response => response.json())
-                    .then(async response => this.balances = response.balances)
-            } catch (error) {
-                console.error(error)
+        // Get balances
+        async getBalances() {
+            // Request
+            this.balances = await this.stargateClient.getAllBalances(this.Keplr.account.address)
+
+            // try {
+            //     // Request
+            //     await fetch(`${this.networks[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/${this.Keplr.account.address}`)
+            //         .then(response => response.json())
+            //         .then(async response => this.balances = response.balances)
+            // } catch (error) {
+            //     console.error(error)
+            // }
+
+            // Get balance info
+            for (const balance of this.balances) {
+                let denomTracesResult = await denomTraces(balance.denom)
+
+                if (!denomTracesResult.ingnoreTraces) {
+                    assets.forEach(chain => {
+                        // Get denom info
+                        let denomInfo = chain.assets.find(token => token.base === denomTracesResult.base_denom)
+
+                        if (denomInfo) {
+                            // Set info
+                            balance.base_denom = denomInfo.base
+                            balance.symbol = denomInfo.symbol
+
+                            // Format denom exponent
+                            let formatableToken = this.formatableTokens.find(el => el.tokenName == denomInfo.base.toUpperCase())
+
+                            // Set exponent for denom
+                            formatableToken
+                                ? balance.exponent = formatableToken.exponent
+                                : balance.exponent = denomInfo.denom_units[1]?.exponent || 0
+                        }
+                    })
+                } else {
+                    // Get denom info by chain-registry assets
+                    try {
+                        // Get chain info
+                        let chainInfo = assets.find(({chain_name}) => chain_name === this.networks[this.currentNetwork].alias)
+
+                        // Get denom info
+                        let denomInfo = chainInfo.assets.find(({base}) => base === balance.denom)
+
+                        // Set info
+                        balance.base_denom = denomTracesResult.base_denom
+                        balance.symbol = denomInfo.symbol
+
+                        // Format token exponent
+                        let formatableToken = this.formatableTokens.find(el => el.tokenName == denomInfo.symbol.toUpperCase())
+
+                        // Set exponent for denom
+                        formatableToken
+                            ? balance.exponent = formatableToken.exponent
+                            : balance.exponent = denomInfo.denom_units.find(el => el.denom == denomTracesResult.base_denom).exponent
+                    } catch (error) {
+                        console.error(error)
+                    }
+                }
+
+                // Get prices
+                balance.price = getPriceByDenom(balance.symbol)
+                balance.cost = formatTokenAmount(balance.amount, balance.base_denom) * balance.price
             }
+
+            // Clear balances
+            this.balances = this.balances.filter(obj => obj.hasOwnProperty('exponent'))
+
+            // Sort by "cost"
+            this.balances.sort((a, b) => {
+                if (a.cost > b.cost) { return -1 }
+                if (a.cost < b.cost) { return 1 }
+                return 0
+            })
         },
     }
 })

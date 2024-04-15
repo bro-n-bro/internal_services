@@ -26,7 +26,7 @@
                     <div class="col_address">{{ item.address }}</div>
 
                     <div class="coins" v-for="coin in item.coins" :key="coinIndex">
-                        <div class="col_denom">{{ formatTokenName(getBestDenom(coin.denom)) }}</div>
+                        <div class="col_denom">{{ formatTokenName(coin.denom) }}</div>
                         <div class="col_amount">{{ coin.amount }}</div>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
     import { inject } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { useNotification } from '@kyvg/vue3-notification'
-    import { prepareTx, sendTx, getBestDenom, formatTokenName } from '@/utils'
+    import { sendTx, formatTokenName } from '@/utils'
 
 
     const store = useGlobalStore(),
@@ -130,11 +130,8 @@
                 }
             }
 
-            // Prepare Tx
-            let prepareResult = await prepareTx([msgAny], true, store.currentNetwork)
-
             // Send Tx
-            let result = await sendTx(prepareResult)
+            let result = await sendTx([msgAny], store.currentNetwork)
 
             if (result.code === 0) {
                 // Show notification
@@ -204,151 +201,143 @@
 
 
 <style scoped>
-.titles
-{
-    font-size: 14px;
-    line-height: 17px;
+    .titles
+    {
+        font-size: 14px;
+        line-height: 17px;
 
-    display: flex;
-    align-content: center;
-    align-items: center;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
 
-    margin-top: 68px;
+        margin-top: 68px;
 
-    color: #8e8e8e;
-    border: 1px solid #fff;
-}
+        color: #8e8e8e;
+        border: 1px solid #fff;
+    }
 
-.titles ~ .titles
-{
-    margin-top: 20px;
-}
-
-
-.titles > *
-{
-    width: 100%;
-    padding: 9px;
-}
-
-.titles > *.col_denom,
-.titles > *.col_amount
-{
-    width: 120px;
-    min-width: 120px;
-}
-
-.titles > * + *
-{
-    border-left: 1px solid #fff;
-}
+    .titles ~ .titles
+    {
+        margin-top: 20px;
+    }
 
 
+    .titles > *
+    {
+        width: 100%;
+        padding: 9px;
+    }
 
-.sender
-{
-    font-size: 14px;
-    line-height: 17px;
+    .titles > *.col_denom,
+    .titles > *.col_amount
+    {
+        width: 120px;
+        min-width: 120px;
+    }
 
-    display: flex;
-    align-content: center;
-    align-items: center;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-
-    margin-top: -1px;
-    padding: 9px;
-
-    border: 1px solid #fff;
-}
+    .titles > * + *
+    {
+        border-left: 1px solid #fff;
+    }
 
 
 
-.recipient
-{
-    font-size: 14px;
-    line-height: 17px;
+    .sender
+    {
+        font-size: 14px;
+        line-height: 17px;
 
-    display: flex;
-    align-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
 
-    margin-top: -1px;
+        margin-top: -1px;
+        padding: 9px;
 
-    border: 1px solid #fff;
-}
-
-
-.recipient .col_address
-{
-    width: calc(100% - 240px);
-    padding: 9px;
-}
-
-
-.recipient .coins
-{
-    display: flex;
-    align-content: stretch;
-    align-items: stretch;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-
-    width: 240px;
-    min-width: 240px;
-    margin-left: auto;
-}
-
-.recipient .coins + .coins
-{
-    border-top: 1px solid #fff;
-}
-
-
-.recipient .coins > *
-{
-    width: 100%;
-    padding: 9px;
-
-    border-left: 1px solid #fff;
-}
-
-
-.recipient .coins .col_denom
-{
-    text-transform: uppercase;
-}
+        border: 1px solid #fff;
+    }
 
 
 
-.confirm_btn
-{
-    font-weight: 500;
-    line-height: 19px;
+    .recipient
+    {
+        font-size: 14px;
+        line-height: 17px;
 
-    display: block;
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-start;
 
-    width: 100%;
-    height: 55px;
-    margin-top: 40px;
-    padding: 10px;
+        margin-top: -1px;
 
-    transition: .2s linear;
-
-    color: #fff;
-    border-radius: 14px;
-    background: #950fff;
-}
+        border: 1px solid #fff;
+    }
 
 
+    .recipient .col_address
+    {
+        width: calc(100% - 240px);
+        padding: 9px;
+    }
+
+
+    .recipient .coins
+    {
+        display: flex;
+        align-content: stretch;
+        align-items: stretch;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+
+        width: 240px;
+        min-width: 240px;
+        margin-left: auto;
+    }
+
+    .recipient .coins + .coins
+    {
+        border-top: 1px solid #fff;
+    }
+
+
+    .recipient .coins > *
+    {
+        width: 100%;
+        padding: 9px;
+
+        border-left: 1px solid #fff;
+    }
+
+
+    .recipient .coins .col_denom
+    {
+        text-transform: uppercase;
+    }
 
 
 
+    .confirm_btn
+    {
+        font-weight: 500;
+        line-height: 19px;
 
+        display: block;
 
+        width: 100%;
+        height: 55px;
+        margin-top: 40px;
+        padding: 10px;
 
+        transition: .2s linear;
+
+        color: #fff;
+        border-radius: 14px;
+        background: #950fff;
+    }
 </style>
