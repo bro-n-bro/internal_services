@@ -67,7 +67,7 @@ export const useGlobalStore = defineStore('global', {
             let result = []
 
             try {
-                await fetch('http://93.159.130.7:8000')
+                await fetch('https://rly.bronbro.io')
                     .then(response => response.json())
                     .then(data => result = data.available_commands)
             } catch (error) {
@@ -103,7 +103,7 @@ export const useGlobalStore = defineStore('global', {
 
             // try {
             //     // Request
-            //     await fetch(`${this.networks[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/${this.Keplr.account.address}`)
+            //     await fetch(`${this.networks[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/bostrom1ke7kxdn29w2lrxt9dzusa6shvmwd8xm9gxm2zf`)
             //         .then(response => response.json())
             //         .then(async response => this.balances = response.balances)
             // } catch (error) {
@@ -160,7 +160,13 @@ export const useGlobalStore = defineStore('global', {
 
                 // Get prices
                 balance.price = getPriceByDenom(balance.symbol)
-                balance.cost = formatTokenAmount(balance.amount, balance.base_denom) * balance.price
+
+                // Calc cost
+                let formatableToken = this.formatableTokens.find(el => el.tokenName == balance.symbol)
+
+                formatableToken
+                    ? balance.cost = balance.amount * balance.price
+                    : balance.cost = formatTokenAmount(balance.amount, balance.base_denom) * balance.price
             }
 
             // Clear balances
@@ -172,6 +178,8 @@ export const useGlobalStore = defineStore('global', {
                 if (a.cost < b.cost) { return 1 }
                 return 0
             })
+
+            console.log(this.balances)
         },
     }
 })
