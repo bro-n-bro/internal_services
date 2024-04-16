@@ -3,7 +3,7 @@
         <div class="list">
             <router-link to="/multisend/cosmoshub" class="item">Multisend</router-link>
 
-            <router-link to="/ibs/cosmoshub" class="item">IBS</router-link>
+            <router-link to="/ibs" class="item">IBS</router-link>
         </div>
     </section>
 </template>

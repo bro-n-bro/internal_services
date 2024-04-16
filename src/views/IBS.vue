@@ -1,364 +1,235 @@
 <template>
+    <Loader v-if="loading" />
+
+    <template v-else>
     <div class="page_head">
         <div class="page_title">
             {{ $t('message.ibs_page_title') }}
         </div>
 
         <!-- Choose network -->
-        <ChooseNetwork />
+        <ChooseNetwork :commands />
     </div>
 
 
     <div class="row">
-        <div class="section">
-            <div class="title">Some title</div>
+        <div class="section" v-for="(relayer, relayerIndex) in relayers" :key="relayerIndex">
+            <div class="title">{{ relayer.chains }}</div>
 
-            <div class="choose_action">
-                <button class="btn" @click.prevent="showDropdown($event)">
-                    <span v-if="!action1.length">Choose action</span>
-                    <span v-else>{{ action1 }}</span>
-
-                    <div class="arr">
-                        <svg><use xlink:href="@/assets/sprite.svg#ic_arr_ver"></use></svg>
-                    </div>
-                </button>
-
-
-                <div class="dropdown">
-                    <div class="scroll">
-                        <button class="btn" @click.prevent="setAction1('Update client')">
-                            Update client
-                        </button>
-
-                        <button class="btn" @click.prevent="setAction1('Clear packets')">
-                            Clear packets
-                        </button>
-
-                        <button class="btn" @click.prevent="setAction1('Packet pending')">
-                            Packet pending
-                        </button>
-                    </div>
-                </div>
+            <div class="commands">
+                <label v-for="(command, commandIndex) in relayers.commands" :key="commandIndex">
+                    <input type="radio" :name="`relayer${relayerIndex}`">
+                    <div>{{ command.name }}</div>
+                </label>
             </div>
 
-
-            <button class="execute_btn" :disabled="!action1.length">
-                {{ $t('message.btn_execute') }}
-            </button>
-        </div>
-
-
-        <div class="section">
-            <div class="title">Some title</div>
-
-            <div class="choose_action">
-                <button class="btn" @click.prevent="showDropdown($event)">
-                    <span v-if="!action2.length">Choose action</span>
-                    <span v-else>{{ action2 }}</span>
-
-                    <div class="arr">
-                        <svg><use xlink:href="@/assets/sprite.svg#ic_arr_ver"></use></svg>
-                    </div>
-                </button>
-
-
-                <div class="dropdown">
-                    <div class="scroll">
-                        <button class="btn" @click.prevent="setAction2('Update client')">
-                            Update client
-                        </button>
-
-                        <button class="btn" @click.prevent="setAction2('Clear packets')">
-                            Clear packets
-                        </button>
-
-                        <button class="btn" @click.prevent="setAction2('Packet pending')">
-                            Packet pending
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-
-            <button class="execute_btn" :disabled="!action2.length">
+            <button class="execute_btn">
                 {{ $t('message.btn_execute') }}
             </button>
         </div>
     </div>
+    </template>
 </template>
 
 
 <script setup>
-    import { ref, onMounted, onBeforeUnmount } from 'vue'
+    import { ref, onBeforeMount, inject } from 'vue'
+    import { useGlobalStore } from '@/stores'
 
     // Components
-    import ChooseNetwork  from '@/components/ChooseNetwork.vue'
+    import Loader from '@/components/Loader.vue'
+    import ChooseNetwork  from '@/components/ibs/ChooseNetwork.vue'
 
 
-    const action1 = ref(''),
-        action2 = ref('')
+    const store = useGlobalStore(),
+        emitter = inject('emitter'),
+        loading = ref(true),
+        commands = ref([]),
+        relayers = ref([])
 
 
-    onMounted(() => {
-        document.addEventListener('click', handleClickOutside)
+    onBeforeMount(async () => {
+        // Get IBS commands
+        commands.value = await store.GetIBSCommands()
+
+        // Hide loader
+        loading.value = false
     })
 
 
-    onBeforeUnmount(() => {
-        document.removeEventListener('click', handleClickOutside)
+    // Get chain data
+    function getChainData(chainId) {
+        // Get chain commands
+        let chainCommands = commands.find(command => command.includes(chainId))
+
+        chainCommands.forEach(command => {
+            // Split
+            let arr = network.value.split('/'),
+                chains = arr[0] + '<=>' + arr[1],
+                relayer = relayers.value.find(el => el.chains != chains)
+
+            if (!relayer) {
+                let fromChainInfo = store.networks.find(el => el.chainId === arr[0]),
+                    toChainInfo = store.networks.find(el => el.chainId === arr[1])
+
+                // Set data
+                relayers.value.push({
+                    chains: arr[0] + '<=>' + arr[1],
+                    from: fromChainInfo.alias,
+                    to: toChainInfo.alias,
+                    fromName: fromChainInfo.name,
+                    toName: toChainInfo.name,
+                    commands: [ {
+                        name: arr[2],
+                        command: command
+                    }]
+                })
+            } else {
+                relayer.commands.push({
+                    name: arr[2],
+                    command: command
+                })
+            }
+        })
+    }
+
+
+    // Event "updateCurrentNetwork"
+    emitter.on('updateCurrentNetwork', ({ chainId }) => {
+        // Show loader
+        loading.value = true
+
+        // Get chain data
+        getChainData(chainId)
+
+        // Hide loader
+        loading.value = false
     })
-
-
-    // Set action1
-    function setAction1(value) {
-        // Set value
-        action1.value = value
-
-        // Hide dropdown
-        hideDropdown()
-    }
-
-
-    // Set action2
-    function setAction2(value) {
-        // Set value
-        action2.value = value
-
-        // Hide dropdown
-        hideDropdown()
-    }
-
-
-    // Show dropdown
-    function showDropdown(e) {
-        hideDropdown()
-
-        e.target.classList.add('active')
-    }
-
-
-    // Hide dropdown
-    function hideDropdown() {
-        let inputs = document.querySelectorAll('.choose_action > .btn')
-
-        inputs.forEach(input => input.classList.remove('active'))
-    }
-
-
-    // Click outside dropdown
-    function handleClickOutside(e) {
-        if (!e.target.closest('.choose_action')) {
-            hideDropdown()
-        }
-    }
 </script>
 
 
 <style scoped>
-    .row
-    {
-        align-content: stretch;
-        align-items: stretch;
+.row
+{
+    align-content: stretch;
+    align-items: stretch;
 
-        margin-bottom: -24px;
-        margin-left: -24px;
-    }
-
-
-    .row > *
-    {
-        width: calc(50% - 24px);
-        margin-bottom: 24px;
-        margin-left: 24px;
-    }
+    margin-bottom: -24px;
+    margin-left: -24px;
+}
 
 
-    .section
-    {
-        padding: 23px;
-
-        border: 1px solid #950fff;
-        border-radius: 14px;
-    }
-
-
-    .section .title
-    {
-        font-size: 20px;
-
-        margin-bottom: 20px;
-
-        text-align: center;
-    }
+.row > *
+{
+    width: calc(50% - 24px);
+    margin-bottom: 24px;
+    margin-left: 24px;
+}
 
 
-    .choose_action
-    {
-        position: relative;
-    }
+.section
+{
+    padding: 23px;
+
+    border: 1px solid #950fff;
+    border-radius: 14px;
+}
 
 
-    .choose_action > .btn
-    {
-        font-weight: 500;
+.section .title
+{
+    font-size: 20px;
 
-        position: relative;
+    margin-bottom: 20px;
 
-        display: block;
-
-        width: 100%;
-        height: 52px;
-        padding: 0 9px 2px;
-
-        text-align: left;
-
-        border: 1px solid #191919;
-        border-radius: 12px;
-        background: #191919;
-    }
+    text-align: center;
+}
 
 
-    .choose_action > .btn > *
-    {
-        pointer-events: none;
-    }
+.commands
+{
+    display: flex;
+    align-content: stretch;
+    align-items: stretch;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
 
 
-    .choose_action .arr
-    {
-        position: absolute;
-        z-index: 3;
-        top: 0;
-        right: 19px;
-        bottom: 0;
-
-        display: flex;
-        align-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: center;
-
-        width: 24px;
-        height: 24px;
-        margin: auto;
-
-        pointer-events: none;
-    }
-
-    .choose_action .arr svg
-    {
-        display: block;
-
-        width: 20px;
-        height: 20px;
-    }
+.commands input
+{
+    display: none;
+}
 
 
-    .dropdown
-    {
-        position: absolute;
-        z-index: 5;
-        top: 100%;
-        left: 0;
+.commands label
+{
+    display: block;
 
-        display: none;
+    cursor: pointer;
 
-        width: 100%;
-        margin-top: 4px;
-        padding: 6px 4px;
-
-        border-radius: 10px;
-        background: #101010;
-    }
-
-    .btn.active + .dropdown
-    {
-        display: block;
-    }
+    border-radius: 10px;
+}
 
 
-    .dropdown .scroll
-    {
-        overflow: auto;
+.commands label div
+{
+    display: flex;
+    align-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
 
-        max-height: 194px;
-        padding-right: 4px;
-    }
+    min-height: 48px;
+    padding: 9px;
 
-    .dropdown .scroll::-webkit-scrollbar
-    {
-        width: 4px;
-        height: 4px;
+    transition: .2s linear;
+    text-align: center;
 
-        border-radius: 5px;
-    }
-
-    .dropdown .scroll > * + *
-    {
-        margin-top: 4px;
-    }
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: #191919;
+}
 
 
-    .dropdown .btn
-    {
-        font-size: 14px;
-        line-height: 17px;
-
-        display: flex;
-        align-content: center;
-        align-items: center;
-        flex-wrap: nowrap;
-        justify-content: space-between;
-
-        width: 100%;
-        padding: 6px;
-
-        transition: background .2s linear;
-        text-align: left;
-        white-space: nowrap;
-        pointer-events: auto;
-
-        border-radius: 8px;
-    }
+.commands input:checked + div
+{
+    border-color: #950fff;
+}
 
 
-    .dropdown .btn:hover,
-    .dropdown .btn.active
-    {
-        background: #191919;
-    }
+.execute_btn
+{
+    font-weight: 500;
+    line-height: 19px;
+
+    display: block;
+
+    width: 100%;
+    height: 48px;
+    margin-top: 20px;
+    padding: 10px;
+
+    transition: .2s linear;
+
+    color: #fff;
+    border-radius: 14px;
+    background: #950fff;
+}
+
+.execute_btn:disabled
+{
+    cursor: default;
+    pointer-events: none;
+
+    opacity: .5;
+}
 
 
-    .execute_btn
-    {
-        font-weight: 500;
-        line-height: 19px;
-
-        display: block;
-
-        width: 100%;
-        height: 48px;
-        margin-top: 20px;
-        padding: 10px;
-
-        transition: .2s linear;
-
-        color: #fff;
-        border-radius: 14px;
-        background: #950fff;
-    }
-
-    .execute_btn:disabled
-    {
-        cursor: default;
-        pointer-events: none;
-
-        opacity: .5;
-    }
+.execute_btn:hover
+{
+    background: #7700e1;
+}
 
 
-    .execute_btn:hover
-    {
-        background: #7700e1;
-    }
 </style>

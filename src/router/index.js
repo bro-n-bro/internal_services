@@ -22,7 +22,7 @@ const routes = [
 		}
 	},
 	{
-		path: '/ibs/:network',
+		path: '/ibs',
 		name: 'IBS',
 		component: () => import('../views/IBS.vue'),
 		meta: {
