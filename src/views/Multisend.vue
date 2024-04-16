@@ -128,7 +128,7 @@
 
     // Components
     import Loader from '@/components/Loader.vue'
-    import ChooseNetwork  from '@/components/ChooseNetwork.vue'
+    import ChooseNetwork  from '@/components/multisend/ChooseNetwork.vue'
     import ConfirmModal  from '@/components/modal/MultisendConfirm.vue'
 
 

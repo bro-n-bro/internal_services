@@ -62,6 +62,22 @@ export const useGlobalStore = defineStore('global', {
         },
 
 
+        // Get IBS commands
+        async GetIBSCommands() {
+            let result = []
+
+            try {
+                await fetch('http://93.159.130.7:8000')
+                    .then(response => response.json())
+                    .then(data => result = data.available_commands)
+            } catch (error) {
+                console.error(error)
+            }
+
+            return result
+        },
+
+
         // Init APP
         async initApp() {
             if (window.keplr) {

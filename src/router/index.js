@@ -21,6 +21,14 @@ const routes = [
 			layout: defaultLayout
 		}
 	},
+	{
+		path: '/ibs',
+		name: 'IBS',
+		component: () => import('../views/IBS.vue'),
+		meta: {
+			layout: defaultLayout
+		}
+	},
 ]
 
 

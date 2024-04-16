@@ -18,11 +18,16 @@ export default {
             'multisend_form_from_label': 'From',
 
 
+            // IBS
+            'ibs_page_title': 'Inter Blockchain Services',
+
+
             // Buttons
             'btn_send': 'Send',
             'btn_max': 'Max',
             'btn_add': 'Add',
             'btn_confirm': 'Confrim',
+            'btn_execute': 'Execute',
 
 
             // Notofications
