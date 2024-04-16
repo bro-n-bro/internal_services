@@ -334,10 +334,16 @@
         margin-top: 40px;
         padding: 10px;
 
-        transition: .2s linear;
+        transition: background .2s linear;
 
         color: #fff;
         border-radius: 14px;
         background: #950fff;
+    }
+
+
+    .confirm_btn:hover
+    {
+        background: #7700e1;
     }
 </style>

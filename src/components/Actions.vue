@@ -2,15 +2,15 @@
     <section class="actions">
         <div class="list">
             <router-link to="/multisend/cosmoshub" class="item">Multisend</router-link>
+
+            <router-link to="/ibs/cosmoshub" class="item">IBS</router-link>
         </div>
     </section>
 </template>
 
 
 <script setup>
-    import { useGlobalStore } from '@/stores'
 
-    const store = useGlobalStore()
 </script>
 
 
