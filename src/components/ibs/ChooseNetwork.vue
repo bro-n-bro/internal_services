@@ -36,11 +36,13 @@
 
 <script setup>
     import { ref, onBeforeMount, inject } from 'vue'
+    import { useGlobalStore } from '@/stores'
     import { onClickOutside } from '@vueuse/core'
     import { getNetworkLogo } from '@/utils'
 
 
     const props = defineProps(['commands']),
+        store = useGlobalStore(),
         emitter = inject('emitter'),
         networks = ref([]),
         currentNetwork = ref({}),
@@ -50,14 +52,15 @@
 
     onBeforeMount(() => {
         // Parse commands
-        props.commands.forEach(network => {
-            let arr = network.value.split('/'),
-                chains = [...arr[0], ...arr[1]]
+        props.commands.forEach(command => {
+            let arr = command.split('/'),
+                chains = [arr[0], arr[1]]
+
 
             chains.forEach(chain => {
-                let networkConfig = store.networks.find(el => el.chainId === chain)
+                let networkConfig = store.networks.find(network => network.chainId === chain)
 
-                if (networks.value.find(el => el.alias != networkConfig.alias)) {
+                if (!networks.value.find(el => el.alias === networkConfig.alias)) {
                     networks.value.push({
                         chainId: chain,
                         alias: networkConfig.alias,
