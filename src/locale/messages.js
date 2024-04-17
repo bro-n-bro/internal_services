@@ -27,6 +27,8 @@ export default {
             'btn_max': 'Max',
             'btn_add': 'Add',
             'btn_confirm': 'Confrim',
+            'btn_clear': 'Packet-pending',
+            'btn_update': 'Update-client',
             'btn_execute': 'Execute',
 
 

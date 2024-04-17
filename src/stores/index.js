@@ -9,11 +9,11 @@ import cosmoshub from '@/stores/networks/cosmoshub'
 import osmosis from '@/stores/networks/osmosis'
 import bostrom from '@/stores/networks/bostrom'
 
-const networks = {
+const networks = [
     cosmoshub,
     osmosis,
     bostrom
-}
+]
 
 
 export const useGlobalStore = defineStore('global', {

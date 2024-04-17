@@ -14,16 +14,18 @@
 
     <div class="row">
         <div class="section" v-for="(relayer, relayerIndex) in relayers" :key="relayerIndex">
-            <div class="title">{{ relayer.chains }}</div>
+            <div class="title">{{ relayer.fromName }} <=> {{ relayer.toName }}</div>
 
             <div class="commands">
-                <label v-for="(command, commandIndex) in relayers.commands" :key="commandIndex">
-                    <input type="radio" :name="`relayer${relayerIndex}`">
-                    <div>{{ command.name }}</div>
+                <label v-for="(command, commandIndex) in relayer.commands" :key="commandIndex">
+                    <input type="radio" v-model="relayer.currentCommand" :value="command.command" :name="`relayer${relayerIndex}`">
+
+                    <div v-if="command.name === 'clear'">{{ $t('message.btn_clear') }}</div>
+                    <div v-if="command.name === 'update'">{{ $t('message.btn_update') }}</div>
                 </label>
             </div>
 
-            <button class="execute_btn">
+            <button class="execute_btn" :disabled="!relayer.currentCommand.length">
                 {{ $t('message.btn_execute') }}
             </button>
         </div>
@@ -44,8 +46,9 @@
     const store = useGlobalStore(),
         emitter = inject('emitter'),
         loading = ref(true),
-        commands = ref([]),
-        relayers = ref([])
+        commands = ref([])
+
+    var relayers = ref([])
 
 
     onBeforeMount(async () => {
@@ -60,15 +63,15 @@
     // Get chain data
     function getChainData(chainId) {
         // Get chain commands
-        let chainCommands = commands.find(command => command.includes(chainId))
+        let chainCommands = commands.value.filter(command => command.includes(chainId))
 
         chainCommands.forEach(command => {
             // Split
-            let arr = network.value.split('/'),
+            let arr = command.split('/'),
                 chains = arr[0] + '<=>' + arr[1],
-                relayer = relayers.value.find(el => el.chains != chains)
+                relayer = relayers.value.find(el => el.chains === chains)
 
-            if (!relayer) {
+            if (relayer == undefined) {
                 let fromChainInfo = store.networks.find(el => el.chainId === arr[0]),
                     toChainInfo = store.networks.find(el => el.chainId === arr[1])
 
@@ -79,7 +82,8 @@
                     to: toChainInfo.alias,
                     fromName: fromChainInfo.name,
                     toName: toChainInfo.name,
-                    commands: [ {
+                    currentCommand: '',
+                    commands: [{
                         name: arr[2],
                         command: command
                     }]
@@ -98,6 +102,9 @@
     emitter.on('updateCurrentNetwork', ({ chainId }) => {
         // Show loader
         loading.value = true
+
+        // Reset data
+        relayers = ref([])
 
         // Get chain data
         getChainData(chainId)
@@ -152,7 +159,10 @@
     align-content: stretch;
     align-items: stretch;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: space-between;
+
+    margin-bottom: -10px;
+    margin-left: -10px;
 }
 
 
@@ -165,6 +175,10 @@
 .commands label
 {
     display: block;
+
+    width: calc(50% - 10px);
+    margin-bottom: 10px;
+    margin-left: 10px;
 
     cursor: pointer;
 
@@ -230,6 +244,8 @@
 {
     background: #7700e1;
 }
+
+
 
 
 </style>
