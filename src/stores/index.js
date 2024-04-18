@@ -185,7 +185,7 @@ export const useGlobalStore = defineStore('global', {
 
         // Init WebSockets
         initWebSockets() {
-            this.socket = new WebSocket('ws://93.159.130.7:8000/ws')
+            this.socket = new WebSocket('wss://rly.bronbro.io/ws')
         },
     }
 })
