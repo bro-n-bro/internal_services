@@ -9,11 +9,11 @@ import cosmoshub from '@/stores/networks/cosmoshub'
 import osmosis from '@/stores/networks/osmosis'
 import bostrom from '@/stores/networks/bostrom'
 
-const networks = [
+const networks = {
     cosmoshub,
     osmosis,
     bostrom
-]
+}
 
 
 export const useGlobalStore = defineStore('global', {
@@ -28,6 +28,8 @@ export const useGlobalStore = defineStore('global', {
         balances: [],
 
         networks,
+
+        socket: {},
 
         formatableTokens: [
             {
@@ -178,8 +180,12 @@ export const useGlobalStore = defineStore('global', {
                 if (a.cost < b.cost) { return 1 }
                 return 0
             })
+        },
 
-            console.log(this.balances)
+
+        // Init WebSockets
+        initWebSockets() {
+            this.socket = new WebSocket('ws://93.159.130.7:8000/ws')
         },
     }
 })

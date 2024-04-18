@@ -20,6 +20,8 @@ export default {
 
             // IBS
             'ibs_page_title': 'Inter Blockchain Services',
+            'ibs_modal_title': 'Logs :',
+            'ibs_modal_processing': 'Processing...',
 
 
             // Buttons
@@ -27,9 +29,10 @@ export default {
             'btn_max': 'Max',
             'btn_add': 'Add',
             'btn_confirm': 'Confrim',
-            'btn_clear': 'Packet-pending',
-            'btn_update': 'Update-client',
+            'btn_clear': 'Clear packets',
+            'btn_update': 'Update client',
             'btn_execute': 'Execute',
+            'btn_close': 'Close',
 
 
             // Notofications
