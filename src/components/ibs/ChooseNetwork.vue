@@ -58,7 +58,14 @@
 
 
             chains.forEach(chain => {
-                let networkConfig = store.networks.find(network => network.chainId === chain)
+                // Get network config
+                let networkConfig = {}
+
+                for (let key in store.networks) {
+                    if (store.networks[key].chainId === chain) {
+                        networkConfig = store.networks[key]
+                    }
+                }
 
                 if (!networks.value.find(el => el.alias === networkConfig.alias)) {
                     networks.value.push({
