@@ -104,6 +104,15 @@
             <button type="button" class="btn" @click="addItems()">
                 {{ $t('message.btn_add') }}
             </button>
+
+            <button type="button" class="clear_btn" v-if="data.length > 5" @click.prevent="resetData()">
+                {{ $t('message.btn_clear_all') }}
+            </button>
+
+            <label class="import_btn">
+                <input type="file" name="import_file" accept=".csv" @change="importCSV($event)">
+                <div>{{ $t('message.btn_import_csv') }}</div>
+            </label>
         </div>
 
 
@@ -121,10 +130,11 @@
 
 
 <script setup>
-    import { reactive, ref, onBeforeMount, onMounted, onBeforeUnmount, inject, watch, computed } from 'vue'
+    import { ref, onBeforeMount, onMounted, onBeforeUnmount, inject, watch, computed } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { useNotification } from '@kyvg/vue3-notification'
     import { formatTokenAmount, formatTokenName } from '@/utils'
+    import Papa from 'papaparse'
 
     // Components
     import Loader from '@/components/Loader.vue'
@@ -139,24 +149,23 @@
         loading = ref(true),
         processing = ref(false),
         add_amount = ref(1),
-        showConfirmModal = ref(false)
-
-    var data = reactive([
-        {
-            address: '',
-            coins: [{
-                amount: '',
-                denom: ''
-            }]
-        },
-    ]),
-    placeholders = reactive([
-        {
-            coins: [{
-                placeholder: '0'
-            }]
-        },
-    ])
+        showConfirmModal = ref(false),
+        data = ref([
+            {
+                address: '',
+                coins: [{
+                    amount: '',
+                    denom: ''
+                }]
+            },
+        ]),
+        placeholders = ref([
+            {
+                coins: [{
+                    placeholder: '0'
+                }]
+            },
+        ])
 
 
     onBeforeMount(async () => {
@@ -174,24 +183,8 @@
         // Show loader
         loading.value = true
 
-        // Clear data
-        data = reactive([
-            {
-                address: '',
-                coins: [{
-                    amount: '',
-                    denom: ''
-                }]
-            },
-        ])
-
-        placeholders = reactive([
-            {
-                coins: [{
-                    placeholder: '0'
-                }]
-            },
-        ])
+        // Reset data
+        resetData()
 
         // Reinit APP
         await store.initApp()
@@ -211,9 +204,27 @@
     })
 
 
+    // Reset data
+    function resetData() {
+        data.value = [{
+            address: '',
+            coins: [{
+                amount: '',
+                denom: ''
+            }]
+        }]
+
+        placeholders.value = [{
+            coins: [{
+                placeholder: '0'
+            }]
+        }]
+    }
+
+
     // Validate address
     function validateAddress(e, itemindex) {
-        let address = data[itemindex].address,
+        let address = data.value[itemindex].address,
             isStartsWith = address.startsWith(store.networks[store.currentNetwork].prefix)
 
         isStartsWith
@@ -225,18 +236,18 @@
     // Set amount
     function setAmount(e, itemindex, coinIndex) {
         // Coin balance
-        let balance = store.balances.find(el => el.denom == data[itemindex].coins[coinIndex].denom)
+        let balance = store.balances.find(el => el.denom == data.value[itemindex].coins[coinIndex].denom)
 
         // Calc total used coins
         let used = calcTotalUsedCoins(itemindex, coinIndex)
 
         // Set amount
         if (parseFloat(e.target.value.replace(',', '.')) > formatTokenAmount(balance.amount - used, balance.base_denom)) {
-            data[itemindex].coins[coinIndex].amount = (formatTokenAmount(balance.amount, balance.base_denom) - used).toString()
+            data.value[itemindex].coins[coinIndex].amount = (formatTokenAmount(balance.amount, balance.base_denom) - used).toString()
         }
 
         if (e.target.value < 0) {
-            data[itemindex].coins[coinIndex].amount = ''
+            data.value[itemindex].coins[coinIndex].amount = ''
         }
 
         // Update placeholders
@@ -247,13 +258,13 @@
     // Set max. amount
     function setMaxAmount(itemindex, coinIndex) {
         // Coin balance
-        let balance = store.balances.find(el => el.denom == data[itemindex].coins[coinIndex].denom)
+        let balance = store.balances.find(el => el.denom == data.value[itemindex].coins[coinIndex].denom)
 
         // Calc total used coins
         let used = calcTotalUsedCoins(itemindex, coinIndex)
 
         // Set amount
-        data[itemindex].coins[coinIndex].amount = (formatTokenAmount(balance.amount, balance.base_denom) - used).toString()
+        data.value[itemindex].coins[coinIndex].amount = (formatTokenAmount(balance.amount, balance.base_denom) - used).toString()
 
         // Update placeholders
         updatePlaceholders()
@@ -266,14 +277,14 @@
         let balance = store.balances.find(el => el.denom == denom)
 
         // Set data
-        data[itemindex].coins[coinIndex].denom = denom
-        data[itemindex].coins[coinIndex].amount = ''
+        data.value[itemindex].coins[coinIndex].denom = denom
+        data.value[itemindex].coins[coinIndex].amount = ''
 
         // Calc total used coins
         let used = calcTotalUsedCoins(itemindex, coinIndex)
 
         // Set placeholder
-        placeholders[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used)
+        placeholders.value[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used)
 
         // Hide dropdown
         hideDropdown()
@@ -288,10 +299,10 @@
         let used = 0
 
         // Calc total used
-        data.forEach((item, itemI) => {
+        data.value.forEach((item, itemI) => {
             item.coins.forEach((coin, coinI) => {
                 if (itemindex == itemI && coinIndex == coinI) { } else {
-                    if (coin.denom == data[itemindex].coins[coinIndex].denom && coin.amount.length) {
+                    if (coin.denom == data.value[itemindex].coins[coinIndex].denom && coin.amount.length) {
                         used += parseFloat(coin.amount)
                     }
                 }
@@ -304,16 +315,16 @@
 
     // Update placeholders
     function updatePlaceholders() {
-        placeholders.forEach((item, itemindex) => {
+        placeholders.value.forEach((item, itemindex) => {
             item.coins.forEach((coin, coinIndex) => {
                 // Coin balance
-                let balance = store.balances.find(el => el.denom == data[itemindex].coins[coinIndex].denom)
+                let balance = store.balances.find(el => el.denom == data.value[itemindex].coins[coinIndex].denom)
 
                 // Calc total used coins
                 let used = calcTotalUsedCoins(itemindex, coinIndex)
 
                 // Set placeholder
-                placeholders[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used)
+                placeholders.value[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used)
             })
         })
     }
@@ -323,7 +334,7 @@
     function addItems() {
         for (var i = 0; i < add_amount.value; i++) {
             // Push data
-            data.push({
+            data.value.push({
                 address: '',
                 coins: [{
                     amount: '',
@@ -332,7 +343,7 @@
             })
 
             // Push placeholder
-            placeholders.push({
+            placeholders.value.push({
                 coins: [{
                     placeholder: '0'
                 }]
@@ -343,21 +354,21 @@
 
     // Delete item
     function deleteItem(itemindex) {
-        data.splice(itemindex, 1)
-        placeholders.splice(itemindex, 1)
+        data.value.splice(itemindex, 1)
+        placeholders.value.splice(itemindex, 1)
     }
 
 
     // Add coin to item
     function addCoinToItem(itemindex) {
         // Push data
-        data[itemindex].coins.push({
+        data.value[itemindex].coins.push({
             amount: '',
             denom: ''
         })
 
         // Push placeholder
-        placeholders[itemindex].coins.push({
+        placeholders.value[itemindex].coins.push({
             placeholder: '0'
         })
     }
@@ -365,8 +376,8 @@
 
     // Delete coin in item
     function deleteCoinInItem(itemindex, coinIndex) {
-        data[itemindex].coins.splice(coinIndex, 1)
-        placeholders[itemindex].coins.splice(coinIndex, 1)
+        data.value[itemindex].coins.splice(coinIndex, 1)
+        placeholders.value[itemindex].coins.splice(coinIndex, 1)
     }
 
 
@@ -429,7 +440,7 @@
     function validateData() {
         let result = true
 
-        data.forEach(item => {
+        data.value.forEach(item => {
             // Check address inputs
             if (!item.address.length) {
                 result = false
@@ -455,6 +466,43 @@
         })
 
         return result
+    }
+
+
+    // import CSV
+    async function importCSV(event) {
+        // Parse file
+        await Papa.parse(event.target.files[0], {
+            header: true,
+            skipEmptyLines: true,
+            complete: result => {
+                // Clear data
+                data.value = []
+                placeholders.value = []
+
+                // Generate data
+                result.data.forEach(el => {
+                    // Push data
+                    data.value.push({
+                        address: el.Address,
+                        coins: [{
+                            amount: el.Amount,
+                            denom: el.Denom
+                        }]
+                    })
+
+                    // Push placeholder
+                    placeholders.value.push({
+                        coins: [{
+                            placeholder: '0'
+                        }]
+                    })
+                })
+
+                // Update placeholders
+                updatePlaceholders()
+            }
+        })
     }
 
 
@@ -595,6 +643,78 @@
 
     .add_btn:hover,
     .delete_btn:hover
+    {
+        background: #950fff;
+    }
+
+
+
+    .clear_btn
+    {
+        font-weight: 500;
+        line-height: 19px;
+
+        display: block;
+
+        height: 55px;
+        margin-left: 40px;
+        padding: 9px 23px;
+
+        transition: .2s linear;
+
+        color: #f81c41;
+        border: 1px solid #f81c41;
+        border-radius: 14px;
+    }
+
+
+    .clear_btn:hover
+    {
+        color: #fff;
+        background: #f81c41;
+    }
+
+
+
+    .import_btn
+    {
+        display: block;
+
+        margin-left: auto;
+
+        cursor: pointer;
+    }
+
+
+    .import_btn input
+    {
+        display: none;
+    }
+
+
+    .import_btn div
+    {
+        font-weight: 500;
+        line-height: 19px;
+
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        height: 55px;
+        padding: 9px 23px;
+
+        transition: .2s linear;
+        text-align: center;
+
+        border: 1px solid #950fff;
+        border-radius: 14px;
+    }
+
+
+    .import_btn:hover div
     {
         background: #950fff;
     }

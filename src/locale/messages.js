@@ -33,6 +33,8 @@ export default {
             'btn_update': 'Update client',
             'btn_execute': 'Execute',
             'btn_close': 'Close',
+            'btn_import_csv': 'Import CSV',
+            'btn_clear_all': 'Clear all',
 
 
             // Notofications
