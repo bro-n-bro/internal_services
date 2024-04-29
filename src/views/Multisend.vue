@@ -333,22 +333,29 @@
     // Add items
     function addItems() {
         for (var i = 0; i < add_amount.value; i++) {
-            // Push data
-            data.value.push({
-                address: '',
-                coins: [{
-                    amount: '',
-                    denom: ''
-                }]
-            })
-
-            // Push placeholder
-            placeholders.value.push({
-                coins: [{
-                    placeholder: '0'
-                }]
-            })
+            // Add item
+            addItem()
         }
+    }
+
+
+    // Add item
+    function addItem(item = null) {
+        // Push data
+        data.value.push({
+            address: !item ? '' : item.Address,
+            coins: [{
+                amount: !item ? '' : item.Amount,
+                denom: !item ? '' : item.Denom
+            }]
+        })
+
+        // Push placeholder
+        placeholders.value.push({
+            coins: [{
+                placeholder: '0'
+            }]
+        })
     }
 
 
@@ -480,29 +487,119 @@
                 data.value = []
                 placeholders.value = []
 
+                // Validate import data
+                let validatedData = validateImportData(result.data)
+
+                // Grouping
+                let formattedData = groupingImportData(validatedData)
+
                 // Generate data
-                result.data.forEach(el => {
-                    // Push data
-                    data.value.push({
-                        address: el.Address,
-                        coins: [{
+                formattedData.forEach(el => {
+                    let item = data.value.find(item => item.address === el.Address)
+
+                    if (item) {
+                        // Add coin to item
+                        data.value[data.value.indexOf(item)].coins.push({
                             amount: el.Amount,
                             denom: el.Denom
-                        }]
-                    })
+                        })
 
-                    // Push placeholder
-                    placeholders.value.push({
-                        coins: [{
+                        // Push placeholder
+                        placeholders.value[data.value.indexOf(item)].coins.push({
                             placeholder: '0'
-                        }]
-                    })
+                        })
+                    } else {
+                        // Add item
+                        addItem(el)
+                    }
                 })
 
                 // Update placeholders
                 updatePlaceholders()
             }
         })
+    }
+
+
+    // Validate import data
+    function validateImportData(importData) {
+        importData.forEach((item, i) => {
+            // Validate addresses
+            if (!item.Address.length) {
+                importData[i] = null
+            } else {
+                // Address prefix
+                let isStartsWith = item.Address.startsWith(store.networks[store.currentNetwork].prefix)
+
+                if (!isStartsWith) {
+                    importData[i] = null
+                }
+            }
+
+
+            // Validate denom
+            if (!item.Denom.length) {
+                importData[i] = null
+            } else {
+                // Availability on balance
+                let availability = store.balances.find(balance => balance.denom == item.Denom)
+
+                if (!availability) {
+                    importData[i] = null
+                }
+            }
+
+
+            // Validate amount
+            if (parseFloat(item.Amount) <= 0) {
+                importData[i] = null
+            }
+        })
+
+
+        // Show error message
+        if (importData.includes(null)) {
+            // Show notification
+            notification.notify({
+                group: 'default',
+                clean: true
+            })
+
+            notification.notify({
+                group: 'default',
+                title: i18n.global.t('message.notification_importCSV_title'),
+                text: i18n.global.t('message.notification_importCSV_desc'),
+                type: 'error',
+                data: {
+                    chain: store.networks[store.currentNetwork].name
+                }
+            })
+        }
+
+
+        return importData.filter(item => item !== null)
+    }
+
+
+    // Grouping import data
+    function groupingImportData(importData) {
+        let result = importData.reduce((acc, obj) => {
+            let key = obj.Address + '-' + obj.Denom
+
+            if (!acc[key]) {
+                acc[key] = {
+                    Address: obj.Address,
+                    Denom: obj.Denom,
+                    Amount: 0
+                }
+            }
+
+            acc[key].Amount += parseFloat(obj.Amount)
+
+            return acc
+        }, {})
+
+        return Object.values(result)
     }
 
 

@@ -85,6 +85,7 @@
     // Set current network
     function setCurrentNetwork(index) {
         // Set data
+        store.currentNetwork = networks.value[index].alias
         currentNetwork.value = networks.value[index]
 
         // Hide dropdown
