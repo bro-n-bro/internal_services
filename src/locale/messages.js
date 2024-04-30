@@ -50,6 +50,9 @@ export default {
             'notification_multisend_success_title': 'Multisend successful',
             'notification_multisend_action': 'Multisend',
 
+            'notification_importCSV_title': 'Some error',
+            'notification_importCSV_desc': 'The imported file contains errors.',
+
             'notification_tx_error_2': "tx parse error",
             'notification_tx_error_3': "invalid sequence",
             'notification_tx_error_4': "unauthorized",

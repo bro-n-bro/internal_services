@@ -6,9 +6,17 @@
                     {{ $t('message.ibs_modal_title') }}
                 </div>
 
-                <div class="list">
+                <div class="list" v-if="wsMessages.length">
                     <div v-for="(message, index) in wsMessages" :key="index">
-                        {{ message }}
+                        <!-- <pre v-if="nessage.type === 'code'">
+                            {{ message.text }}
+                        </pre>
+
+                        <template v-else>
+                            {{ message.text }}
+                        </template> -->
+
+                        {{ message.text }}
                     </div>
                 </div>
 
@@ -34,18 +42,32 @@
 
     const store = useGlobalStore(),
         emitter = inject('emitter'),
-        processing = ref(true)
-
-    var wsMessages = ref([])
+        processing = ref(true),
+        wsMessages = ref([])
 
 
     onBeforeMount(async () => {
         // Reset data
-        wsMessages = ref([])
+        wsMessages.value = []
 
         // Get messages
         store.socket.onmessage = e => {
-            wsMessages.value.push(e.data)
+            // if (e.data.startsWith('SUCCESS [')) {
+            //     wsMessages.value.push({
+            //         text: e.data,
+            //         type: 'code'
+            //     })
+            // } else {
+            //     wsMessages.value.push({
+            //         text: e.data,
+            //         type: 'text'
+            //     })
+            // }
+
+            wsMessages.value.push({
+                text: e.data,
+                type: 'text'
+            })
 
             // Finished status
             if (e.data === 'FINISHED') {
