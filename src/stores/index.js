@@ -114,12 +114,13 @@ export const useGlobalStore = defineStore('global', {
 
             // Get balance info
             for (const balance of this.balances) {
-                let denomTracesResult = await denomTraces(balance.denom)
+                // Denom traces
+                balance.denom_traces = await denomTraces(balance.denom)
 
-                if (!denomTracesResult.ingnoreTraces) {
+                if (!balance.denom_traces.ingnoreTraces) {
                     assets.forEach(chain => {
                         // Get denom info
-                        let denomInfo = chain.assets.find(token => token.base === denomTracesResult.base_denom)
+                        let denomInfo = chain.assets.find(token => token.base === balance.denom_traces.base_denom)
 
                         if (denomInfo) {
                             // Set info
@@ -145,7 +146,7 @@ export const useGlobalStore = defineStore('global', {
                         let denomInfo = chainInfo.assets.find(({base}) => base === balance.denom)
 
                         // Set info
-                        balance.base_denom = denomTracesResult.base_denom
+                        balance.base_denom = balance.denom_traces.base_denom
                         balance.symbol = denomInfo.symbol
 
                         // Format token exponent
@@ -154,7 +155,7 @@ export const useGlobalStore = defineStore('global', {
                         // Set exponent for denom
                         formatableToken
                             ? balance.exponent = formatableToken.exponent
-                            : balance.exponent = denomInfo.denom_units.find(el => el.denom == denomTracesResult.base_denom).exponent
+                            : balance.exponent = denomInfo.denom_units.find(el => el.denom == balance.denom_traces.base_denom).exponent
                     } catch (error) {
                         console.error(error)
                     }

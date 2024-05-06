@@ -1,8 +1,8 @@
 import { useGlobalStore } from '@/stores'
-import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { GasPrice, SigningStargateClient } from '@cosmjs/stargate'
 import { fromBech32, toBech32 } from '@cosmjs/encoding'
 import { Decimal } from '@cosmjs/math'
+import { chains } from 'chain-registry'
 
 
 // Generate address
@@ -14,7 +14,10 @@ export const generateAddress = (prefix, address) => {
 // Denom traces
 export const denomTraces = async string => {
     let store = useGlobalStore(),
-        result = {},
+        result = {
+            path: null,
+            base_denom: string
+        },
         hash = string.split('/')
 
     if (hash[0] == 'ibc') {
@@ -29,8 +32,6 @@ export const denomTraces = async string => {
     } else if (hash[0] == 'factory') {
         result.ingnoreTraces = true
         result.base_denom = hash[hash.length - 1]
-    } else {
-        result.base_denom = string
     }
 
     return result
@@ -100,11 +101,11 @@ export const sendTx = async (msg, chain) => {
     let store = useGlobalStore()
 
     // Create signer
-    let offlineSigner = await window.getOfflineSignerAuto(store.networks[chain].chainId)
+    // let offlineSigner = await window.getOfflineSignerAuto(store.networks[chain].chainId)
 
-    Object.assign(offlineSigner, {
-        signAmino: offlineSigner.signAmino ?? offlineSigner.sign
-    })
+    // Object.assign(offlineSigner, {
+    //     signAmino: offlineSigner.signAmino ?? offlineSigner.sign
+    // })
 
     // RPC endpoint
     let rpcEndpoint = store.networks[chain].rpc_api
@@ -118,7 +119,7 @@ export const sendTx = async (msg, chain) => {
     let gasPrice = new GasPrice(Decimal.fromUserInput(feeCurrencies.gasPriceStep?.average.toString() || '0', 3), feeCurrencies?.coinMinimalDenom)
 
     // Client
-    let client = await SigningStargateClient.connectWithSigner(rpcEndpoint, offlineSigner, {
+    let client = await SigningStargateClient.connectWithSigner(rpcEndpoint, store.Keplr.offlineSinger, {
         gasPrice
     })
 
@@ -134,8 +135,10 @@ export const sendTx = async (msg, chain) => {
 
 
 // Get metwork logo
-export const getNetworkLogo = alias => {
-    return require(`@/assets/${alias}_logo.png`)
+export const getNetworkLogo = chainId => {
+    let logos = chains.find(el => el.chain_id === chainId).images
+
+    return logos[logos.length - 1].svg ? logos[logos.length - 1].svg : logos[logos.length - 1].png
 }
 
 

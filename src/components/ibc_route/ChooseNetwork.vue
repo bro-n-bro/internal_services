@@ -2,11 +2,12 @@
     <div class="choose_network" ref="target">
         <button class="btn" @click.prevent="showDropdown = !showDropdown">
             <div class="logo">
-                <img :src="getNetworkLogo(currentNetwork.chainId)" alt="">
+                <img :src="getNetworkLogo(store.networks[store.currentNetwork].chainId)" alt="">
             </div>
 
             <div>
-                <div class="name">{{ currentNetwork.name }}</div>
+                <div class="name">{{ store.networks[store.currentNetwork].name }}</div>
+                <div class="token">{{ store.networks[store.currentNetwork].token_name }}</div>
             </div>
 
             <svg class="arr"><use xlink:href="@/assets/sprite.svg#ic_arr_ver"></use></svg>
@@ -15,18 +16,22 @@
 
         <div class="mini_modal" v-show="showDropdown">
             <div class="scroll">
-                <div v-for="(network, index) in networks" :key="index">
-                    <button class="network" :class="{ active: store.currentNetwork == network.alias }" @click.prevent="setCurrentNetwork(index)">
+                <div v-for="(network, index) in store.networks" :key="index">
+                    <router-link class="network" :class="{ active: store.currentNetwork == network.alias }"
+                        :to="`/ibc_route/${network.alias}`"
+                        @click="showDropdown = !showDropdown"
+                    >
                         <div class="logo">
                             <img :src="getNetworkLogo(network.chainId)" alt="">
                         </div>
 
                         <div>
                             <div class="name">{{ network.name }}</div>
+                            <div class="token">{{ network.token_name }}</div>
                         </div>
 
                         <svg class="icon"><use xlink:href="@/assets/sprite.svg#ic_check"></use></svg>
-                    </button>
+                    </router-link>
                 </div>
             </div>
         </div>
@@ -35,65 +40,15 @@
 
 
 <script setup>
-    import { ref, onBeforeMount, inject } from 'vue'
+    import { ref } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { onClickOutside } from '@vueuse/core'
     import { getNetworkLogo } from '@/utils'
 
 
-    const props = defineProps(['commands']),
-        store = useGlobalStore(),
-        emitter = inject('emitter'),
-        networks = ref([]),
-        currentNetwork = ref({}),
+    const store = useGlobalStore(),
         showDropdown = ref(false),
         target = ref(null)
-
-
-    onBeforeMount(() => {
-        // Parse commands
-        props.commands.forEach(command => {
-            let arr = command.split('/'),
-                chains = [arr[0], arr[1]]
-
-
-            chains.forEach(chain => {
-                // Get network config
-                let networkConfig = {}
-
-                for (let key in store.networks) {
-                    if (store.networks[key].chainId === chain) {
-                        networkConfig = store.networks[key]
-                    }
-                }
-
-                if (!networks.value.find(el => el.alias === networkConfig.alias)) {
-                    networks.value.push({
-                        chainId: chain,
-                        alias: networkConfig.alias,
-                        name: networkConfig.name
-                    })
-                }
-            })
-        })
-
-        // Set current network
-        setCurrentNetwork(0)
-    })
-
-
-    // Set current network
-    function setCurrentNetwork(index) {
-        // Set data
-        store.currentNetwork = networks.value[index].alias
-        currentNetwork.value = networks.value[index]
-
-        // Hide dropdown
-        showDropdown.value = false
-
-        // Send "updateCurrentNetwork" event
-        emitter.emit('updateCurrentNetwork', { chainId: networks.value[index].chainId })
-    }
 
 
     // Click outside
@@ -173,6 +128,19 @@
         font-size: 18px;
         font-weight: 500;
         line-height: 100%;
+    }
+
+
+    .choose_network .btn .token
+    {
+        font-size: 12px;
+        line-height: 15px;
+
+        margin-top: 6px;
+
+        text-transform: uppercase;
+
+        color: #555;
     }
 
 
@@ -302,6 +270,19 @@
     .choose_network .network .name
     {
         line-height: 100%;
+    }
+
+
+    .choose_network .network .token
+    {
+        font-size: 12px;
+        line-height: 15px;
+
+        margin-top: 6px;
+
+        text-transform: uppercase;
+
+        color: #555;
     }
 
 

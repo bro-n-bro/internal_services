@@ -2,7 +2,7 @@
     <div class="choose_network" ref="target">
         <button class="btn" @click.prevent="showDropdown = !showDropdown">
             <div class="logo">
-                <img :src="getNetworkLogo(store.networks[store.currentNetwork].alias)" alt="">
+                <img :src="getNetworkLogo(store.networks[store.currentNetwork].chainId)" alt="">
             </div>
 
             <div>
@@ -22,7 +22,7 @@
                         @click="showDropdown = !showDropdown"
                     >
                         <div class="logo">
-                            <img :src="getNetworkLogo(network.alias)" alt="">
+                            <img :src="getNetworkLogo(network.chainId)" alt="">
                         </div>
 
                         <div>

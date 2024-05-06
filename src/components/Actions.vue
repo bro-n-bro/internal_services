@@ -4,6 +4,8 @@
             <router-link to="/multisend/cosmoshub" class="item">Multisend</router-link>
 
             <router-link to="/ibs" class="item">IBS</router-link>
+
+            <router-link to="/ibc_route/cosmoshub" class="item">IBC route</router-link>
         </div>
     </section>
 </template>

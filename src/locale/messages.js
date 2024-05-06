@@ -24,6 +24,10 @@ export default {
             'ibs_modal_processing': 'Processing...',
 
 
+            // IBC route
+            'ibc_route_page_title': 'IBC route',
+
+
             // Buttons
             'btn_send': 'Send',
             'btn_max': 'Max',

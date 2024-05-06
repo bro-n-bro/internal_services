@@ -29,6 +29,14 @@ const routes = [
 			layout: defaultLayout
 		}
 	},
+	{
+		path: '/ibc_route/:network',
+		name: 'IBCRoute',
+		component: () => import('../views/IBCRoute.vue'),
+		meta: {
+			layout: defaultLayout
+		}
+	},
 ]
 
 
