@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkinternal_services"]=self["webpackChunkinternal_services"]||[]).push([[798],{25798:function(e,n,s){s.r(n),s.d(n,{default:function(){return c}});s(44114);var u=s(56768),r=s(81387),t={__name:"MainPage",setup(e){const n=(0,r.rd)();return(0,u.KC)((()=>{n.push("/multisend/cosmoshub")})),(e,n)=>null}};const a=t;var c=a}}]);
+//# sourceMappingURL=798.7c40fc9c.js.map
