@@ -14,7 +14,13 @@
 
     <div class="row">
         <div class="section" v-for="(relayer, relayerIndex) in relayers" :key="relayerIndex">
-            <div class="title">{{ relayer.fromName }} <=> {{ relayer.toName }}</div>
+            <div class="title">
+                <span>{{ relayer.fromName }}</span>
+
+                <span class="sep"><=></span>
+
+                <span>{{ relayer.toName }}</span>
+            </div>
 
             <div class="commands">
                 <label v-for="(command, commandIndex) in relayer.commands" :key="commandIndex" @click.prevent="setCommand(relayerIndex, command.command)">
@@ -40,6 +46,7 @@
 <script setup>
     import { ref, onBeforeMount, inject } from 'vue'
     import { useGlobalStore } from '@/stores'
+    import { chains } from 'chain-registry'
 
     // Components
     import Loader from '@/components/Loader.vue'
@@ -51,9 +58,8 @@
         emitter = inject('emitter'),
         loading = ref(true),
         commands = ref([]),
-        showAnswersModal = ref(false)
-
-    var relayers = ref([])
+        showAnswersModal = ref(false),
+        relayers = ref([])
 
 
     onBeforeMount(async () => {
@@ -73,34 +79,33 @@
         // Get chain commands
         let chainCommands = commands.value.filter(command => command.includes(chainId))
 
+
+        console.log(chainCommands)
+
         chainCommands.forEach(command => {
             // Split
             let arr = command.split('/'),
-                chains = arr[0] + '<=>' + arr[1],
-                relayer = relayers.value.find(el => el.chains === chains)
+                chainsTitle = arr[0] + '<=>' + arr[1],
+                relayer = relayers.value.find(el => el.title === chainsTitle)
 
             if (relayer == undefined) {
                 // Get network config
                 let fromChainInfo = {},
                     toChainInfo = {}
 
-                for (let key in store.networks) {
-                    if (store.networks[key].chainId === arr[0]) {
-                        fromChainInfo = store.networks[key]
-                    }
+                // From chain info
+                fromChainInfo = chains.find(chain => chain.chain_id === arr[0])
 
-                    if (store.networks[key].chainId === arr[1]) {
-                        toChainInfo = store.networks[key]
-                    }
-                }
+                // To chain info
+                toChainInfo = chains.find(chain => chain.chain_id === arr[1])
 
                 // Set data
                 relayers.value.push({
-                    chains: arr[0] + '<=>' + arr[1],
-                    from: fromChainInfo.alias,
-                    to: toChainInfo.alias,
-                    fromName: fromChainInfo.name,
-                    toName: toChainInfo.name,
+                    title: chainsTitle,
+                    from: fromChainInfo.bech32_prefix,
+                    to: toChainInfo.bech32_prefix,
+                    fromName: fromChainInfo.pretty_name,
+                    toName: toChainInfo.pretty_name,
                     currentCommand: '',
                     commands: [{
                         name: arr[2],
@@ -139,7 +144,7 @@
         loading.value = true
 
         // Reset data
-        relayers = ref([])
+        relayers.value = []
 
         // Get chain data
         getChainData(chainId)
@@ -158,138 +163,168 @@
 
 
 <style scoped>
-    .row
-    {
-        align-content: stretch;
-        align-items: stretch;
+.row
+{
+    align-content: stretch;
+    align-items: stretch;
 
-        margin-bottom: -24px;
-        margin-left: -24px;
-    }
-
-
-    .row > *
-    {
-        width: calc(50% - 24px);
-        margin-bottom: 24px;
-        margin-left: 24px;
-    }
+    margin-bottom: -24px;
+    margin-left: -24px;
+}
 
 
-    .section
-    {
-        padding: 23px;
-
-        border: 1px solid #950fff;
-        border-radius: 14px;
-    }
-
-
-    .section .title
-    {
-        font-size: 20px;
-
-        margin-bottom: 20px;
-
-        text-align: center;
-    }
+.row > *
+{
+    width: calc(50% - 24px);
+    margin-bottom: 24px;
+    margin-left: 24px;
+}
 
 
-    .commands
-    {
-        display: flex;
-        align-content: stretch;
-        align-items: stretch;
-        flex-wrap: wrap;
-        justify-content: space-between;
+.section
+{
+    padding: 23px;
 
-        margin-bottom: -10px;
-        margin-left: -10px;
-    }
+    border: 1px solid #950fff;
+    border-radius: 14px;
+}
 
 
-    .commands input
-    {
-        display: none;
-    }
+.section .title
+{
+    font-size: 20px;
+
+    display: flex;
+    align-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    margin-bottom: 20px;
+
+    text-align: center;
+}
 
 
-    .commands label
-    {
-        display: block;
+.section .title span
+{
+    display: block;
 
-        width: calc(50% - 10px);
-        margin-bottom: 10px;
-        margin-left: 10px;
+    text-transform: lowercase;
+}
 
-        cursor: pointer;
-
-        border-radius: 10px;
-    }
-
-
-    .commands label > *
-    {
-        pointer-events: none;
-    }
+.section .title span::first-letter
+{
+    text-transform: uppercase;
+}
 
 
-    .commands label div
-    {
-        display: flex;
-        align-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: center;
-
-        min-height: 48px;
-        padding: 9px;
-
-        transition: .2s linear;
-        text-align: center;
-
-        border: 1px solid transparent;
-        border-radius: 10px;
-        background: #191919;
-    }
+.section .title .sep
+{
+    margin: 0 12px;
+}
 
 
-    .commands input:checked + div
-    {
-        border-color: #950fff;
-    }
+.commands
+{
+    display: flex;
+    align-content: stretch;
+    align-items: stretch;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    margin-bottom: -10px;
+    margin-left: -10px;
+}
 
 
-    .execute_btn
-    {
-        font-weight: 500;
-        line-height: 19px;
-
-        display: block;
-
-        width: 100%;
-        height: 48px;
-        margin-top: 20px;
-        padding: 10px;
-
-        transition: .2s linear;
-
-        color: #fff;
-        border-radius: 14px;
-        background: #950fff;
-    }
-
-    .execute_btn:disabled
-    {
-        cursor: default;
-        pointer-events: none;
-
-        opacity: .5;
-    }
+.commands input
+{
+    display: none;
+}
 
 
-    .execute_btn:hover
-    {
-        background: #7700e1;
-    }
+.commands label
+{
+    display: block;
+
+    width: calc(50% - 10px);
+    margin-bottom: 10px;
+    margin-left: 10px;
+
+    cursor: pointer;
+
+    border-radius: 10px;
+}
+
+
+.commands label > *
+{
+    pointer-events: none;
+}
+
+
+.commands label div
+{
+    display: flex;
+    align-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    min-height: 48px;
+    padding: 9px;
+
+    transition: .2s linear;
+    text-align: center;
+
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: #191919;
+}
+
+
+.commands input:checked + div
+{
+    border-color: #950fff;
+}
+
+
+.execute_btn
+{
+    font-weight: 500;
+    line-height: 19px;
+
+    display: block;
+
+    width: 100%;
+    height: 48px;
+    margin-top: 20px;
+    padding: 10px;
+
+    transition: .2s linear;
+
+    color: #fff;
+    border-radius: 14px;
+    background: #950fff;
+}
+
+.execute_btn:disabled
+{
+    cursor: default;
+    pointer-events: none;
+
+    opacity: .5;
+}
+
+
+.execute_btn:hover
+{
+    background: #7700e1;
+}
+
+
+
+
+
 </style>

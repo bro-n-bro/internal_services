@@ -2,11 +2,11 @@
     <div class="choose_network" ref="target">
         <button class="btn" @click.prevent="showDropdown = !showDropdown">
             <div class="logo">
-                <img :src="getNetworkLogo(currentNetwork.chainId)" alt="">
+                <img :src="getNetworkLogo(currentNetwork.chain_id)" alt="">
             </div>
 
             <div>
-                <div class="name">{{ currentNetwork.name }}</div>
+                <div class="name">{{ currentNetwork.pretty_name }}</div>
             </div>
 
             <svg class="arr"><use xlink:href="@/assets/sprite.svg#ic_arr_ver"></use></svg>
@@ -16,13 +16,13 @@
         <div class="mini_modal" v-show="showDropdown">
             <div class="scroll">
                 <div v-for="(network, index) in networks" :key="index">
-                    <button class="network" :class="{ active: store.currentNetwork == network.alias }" @click.prevent="setCurrentNetwork(index)">
+                    <button class="network" :class="{ active: currentNetwork.chain_id == network.chain_id }" @click.prevent="setCurrentNetwork(index)">
                         <div class="logo">
-                            <img :src="getNetworkLogo(network.chainId)" alt="">
+                            <img :src="getNetworkLogo(network.chain_id)" alt="">
                         </div>
 
                         <div>
-                            <div class="name">{{ network.name }}</div>
+                            <div class="name">{{ network.pretty_name }}</div>
                         </div>
 
                         <svg class="icon"><use xlink:href="@/assets/sprite.svg#ic_check"></use></svg>
@@ -39,6 +39,7 @@
     import { useGlobalStore } from '@/stores'
     import { onClickOutside } from '@vueuse/core'
     import { getNetworkLogo } from '@/utils'
+    import { chains } from 'chain-registry'
 
 
     const props = defineProps(['commands']),
@@ -54,25 +55,14 @@
         // Parse commands
         props.commands.forEach(command => {
             let arr = command.split('/'),
-                chains = [arr[0], arr[1]]
+                chainIDs = [arr[0], arr[1]]
 
-
-            chains.forEach(chain => {
+            chainIDs.forEach(chainId => {
                 // Get network config
-                let networkConfig = {}
+                let networkConfig = chains.find(chain => chain.chain_id === chainId)
 
-                for (let key in store.networks) {
-                    if (store.networks[key].chainId === chain) {
-                        networkConfig = store.networks[key]
-                    }
-                }
-
-                if (!networks.value.find(el => el.alias === networkConfig.alias)) {
-                    networks.value.push({
-                        chainId: chain,
-                        alias: networkConfig.alias,
-                        name: networkConfig.name
-                    })
+                if (!networks.value.find(el => el.chain_id === networkConfig.chain_id)) {
+                    networks.value.push(chains.find(chain => chain.chain_id === chainId))
                 }
             })
         })
@@ -85,14 +75,13 @@
     // Set current network
     function setCurrentNetwork(index) {
         // Set data
-        store.currentNetwork = networks.value[index].alias
         currentNetwork.value = networks.value[index]
 
         // Hide dropdown
         showDropdown.value = false
 
         // Send "updateCurrentNetwork" event
-        emitter.emit('updateCurrentNetwork', { chainId: networks.value[index].chainId })
+        emitter.emit('updateCurrentNetwork', { chainId: networks.value[index].chain_id })
     }
 
 
@@ -126,6 +115,7 @@
 
         transition: background .2s linear;
         text-align: left;
+        text-transform: lowercase;
 
         border: 1px solid transparent;
         border-radius: 14px;
@@ -162,9 +152,16 @@
         object-fit: cover;
     }
 
+
     .choose_network .btn .logo + *
     {
         width: calc(100% - 92px);
+    }
+
+
+    .choose_network .btn .logo + * ::first-letter
+    {
+        text-transform: uppercase;
     }
 
 
@@ -302,6 +299,14 @@
     .choose_network .network .name
     {
         line-height: 100%;
+
+        text-transform: lowercase;
+    }
+
+
+    .choose_network .network .name::first-letter
+    {
+        text-transform: uppercase;
     }
 
 
