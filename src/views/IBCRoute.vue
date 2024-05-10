@@ -15,7 +15,19 @@
 
     <div class="list">
         <div class="item" v-for="(balance, index) in store.balances" :key="index">
-            <div class="denom">{{ formatTokenName(balance.denom) }}</div>
+            <div class="row">
+                <div class="amount">
+                    <template v-if="formatTokenAmount(balance.amount, balance.base_denom) < 0.01">
+                    &lt; 0.01
+                    </template>
+
+                    <template v-else>
+                    {{ $filters.toFixed(formatTokenAmount(balance.amount, balance.base_denom), 2) }}
+                    </template>
+                </div>
+
+                <div class="denom">{{ formatTokenName(balance.denom) }}</div>
+            </div>
 
             <div class="path">
                 <div class="label">Path: </div>
@@ -53,7 +65,7 @@
     import { ref, onBeforeMount, watch, computed } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { chains } from 'chain-registry'
-    import { denomTraces, formatTokenName } from '@/utils'
+    import { formatTokenAmount, formatTokenName } from '@/utils'
 
     // Components
     import Loader from '@/components/Loader.vue'
@@ -155,9 +167,18 @@
 }
 
 
+.item .amount
+{
+    margin-bottom: 12px;
+
+    text-transform: uppercase;
+}
+
+
 .item .denom
 {
     margin-bottom: 12px;
+    margin-left: 4px;
 
     text-transform: uppercase;
 }
@@ -265,5 +286,8 @@
 
     opacity: .5;
 }
+
+
+
 
 </style>
