@@ -55,14 +55,18 @@
         // Parse commands
         props.commands.forEach(command => {
             let arr = command.split('/'),
-                chainIDs = [arr[0], arr[1]]
+                chainIDs = [arr[0], arr[1]],
+                networkConfig = null
 
             chainIDs.forEach(chainId => {
                 // Get network config
-                let networkConfig = chains.find(chain => chain.chain_id === chainId)
+                chainId === 'space-pussy'
+                    ? networkConfig = store.networks.ibs.space_pussy
+                    : networkConfig = chains.find(chain => chain.chain_id === chainId)
 
+                // Set data
                 if (!networks.value.find(el => el.chain_id === networkConfig.chain_id)) {
-                    networks.value.push(chains.find(chain => chain.chain_id === chainId))
+                    networks.value.push(networkConfig)
                 }
             })
         })

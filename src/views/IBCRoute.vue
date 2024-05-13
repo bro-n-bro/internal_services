@@ -114,7 +114,7 @@
             if (balance.denom_traces.path) {
                 // Set default network
                 balance.return_path.push({
-                    chain_name: store.networks[store.currentNetwork].name,
+                    chain_name: store.networks.IBC[store.currentNetwork].name,
                 })
 
                 for (const item of balance.denom_traces.path.match(/transfer\/channel-\d+/g)) {
@@ -124,7 +124,7 @@
                     }
 
                     // Get connection
-                    await fetch(`${store.networks[store.currentNetwork].lcd_api}/ibc/core/channel/v1/channels/${data.channel}/ports/transfer`)
+                    await fetch(`${store.networks.IBC[store.currentNetwork].lcd_api}/ibc/core/channel/v1/channels/${data.channel}/ports/transfer`)
                         .then(response => response.json())
                         .then(result => {
                             data.connection = result.channel.connection_hops[0]
@@ -132,7 +132,7 @@
                         })
 
                     // Get chain id
-                    await fetch(`${store.networks[store.currentNetwork].lcd_api}/ibc/core/connection/v1/connections/${data.connection}/client_state`)
+                    await fetch(`${store.networks.IBC[store.currentNetwork].lcd_api}/ibc/core/connection/v1/connections/${data.connection}/client_state`)
                         .then(response => response.json())
                         .then(result => data.chain_id = result.identified_client_state.client_state.chain_id)
 

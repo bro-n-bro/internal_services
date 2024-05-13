@@ -79,9 +79,6 @@
         // Get chain commands
         let chainCommands = commands.value.filter(command => command.includes(chainId))
 
-
-        console.log(chainCommands)
-
         chainCommands.forEach(command => {
             // Split
             let arr = command.split('/'),
@@ -94,10 +91,17 @@
                     toChainInfo = {}
 
                 // From chain info
-                fromChainInfo = chains.find(chain => chain.chain_id === arr[0])
+                arr[0] === 'space-pussy'
+                    ? fromChainInfo = store.networks.ibs.space_pussy
+                    : fromChainInfo = chains.find(chain => chain.chain_id === arr[0])
 
                 // To chain info
-                toChainInfo = chains.find(chain => chain.chain_id === arr[1])
+                arr[1] === 'space-pussy'
+                    ? toChainInfo = store.networks.ibs.space_pussy
+                    : toChainInfo = chains.find(chain => chain.chain_id === arr[1])
+
+                    console.log(fromChainInfo)
+                    console.log(toChainInfo)
 
                 // Set data
                 relayers.value.push({
@@ -118,6 +122,9 @@
                     command: command
                 })
             }
+
+
+            console.log(relayers.value)
         })
     }
 

@@ -1,7 +1,7 @@
 <template>
     <div class="page_head">
         <div class="page_title">
-            {{ $t('message.multisend_page_title', { network : store.networks[store.currentNetwork].name }) }}
+            {{ $t('message.multisend_page_title', { network : store.networks.multisend[store.currentNetwork].name }) }}
         </div>
 
         <!-- Choose network -->
@@ -225,7 +225,7 @@
     // Validate address
     function validateAddress(e, itemindex) {
         let address = data.value[itemindex].address,
-            isStartsWith = address.startsWith(store.networks[store.currentNetwork].prefix)
+            isStartsWith = address.startsWith(store.networks.multisend[store.currentNetwork].prefix)
 
         isStartsWith
             ? e.target.classList.remove('error')
@@ -433,7 +433,7 @@
                 text: i18n.global.t('message.notification_failed_validate_desc'),
                 type: 'error',
                 data: {
-                    chain: store.networks[store.currentNetwork].name
+                    chain: store.networks.multisend[store.currentNetwork].name
                 }
             })
 
@@ -529,7 +529,7 @@
                 importData[i] = null
             } else {
                 // Address prefix
-                let isStartsWith = item.Address.startsWith(store.networks[store.currentNetwork].prefix)
+                let isStartsWith = item.Address.startsWith(store.networks.multisend[store.currentNetwork].prefix)
 
                 if (!isStartsWith) {
                     importData[i] = null
@@ -571,7 +571,7 @@
                 text: i18n.global.t('message.notification_importCSV_desc'),
                 type: 'error',
                 data: {
-                    chain: store.networks[store.currentNetwork].name
+                    chain: store.networks.multisend[store.currentNetwork].name
                 }
             })
         }
