@@ -8,11 +8,22 @@ import { getPriceByDenom, formatTokenAmount } from '@/utils'
 import cosmoshub from '@/stores/networks/cosmoshub'
 import osmosis from '@/stores/networks/osmosis'
 import bostrom from '@/stores/networks/bostrom'
+import space_pussy from '@/stores/networks/space_pussy'
 
 const networks = {
-    cosmoshub,
-    osmosis,
-    bostrom
+    multisend: {
+        cosmoshub,
+        osmosis,
+        bostrom
+    },
+    ibs: {
+        space_pussy
+    },
+    IBC: {
+        cosmoshub,
+        osmosis,
+        bostrom
+    },
 }
 
 
@@ -84,10 +95,10 @@ export const useGlobalStore = defineStore('global', {
         async initApp() {
             if (window.keplr) {
                 // Keplr connect
-                await createKeplrOfflineSinger(this.networks[this.currentNetwork].chainId)
+                await createKeplrOfflineSinger(this.networks.multisend[this.currentNetwork].chainId)
 
                 // Stargate client
-                this.stargateClient = await SigningStargateClient.connectWithSigner(this.networks[this.currentNetwork].rpc_api, this.Keplr.offlineSinger)
+                this.stargateClient = await SigningStargateClient.connectWithSigner(this.networks.multisend[this.currentNetwork].rpc_api, this.Keplr.offlineSinger)
 
                 // Get currencies price
                 await this.getCurrenciesPrice()
@@ -105,7 +116,7 @@ export const useGlobalStore = defineStore('global', {
 
             // try {
             //     // Request
-            //     await fetch(`${this.networks[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/bostrom1ke7kxdn29w2lrxt9dzusa6shvmwd8xm9gxm2zf`)
+            //     await fetch(`${this.networks.multisend[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/bostrom1ke7kxdn29w2lrxt9dzusa6shvmwd8xm9gxm2zf`)
             //         .then(response => response.json())
             //         .then(async response => this.balances = response.balances)
             // } catch (error) {
@@ -140,7 +151,7 @@ export const useGlobalStore = defineStore('global', {
                     // Get denom info by chain-registry assets
                     try {
                         // Get chain info
-                        let chainInfo = assets.find(({chain_name}) => chain_name === this.networks[this.currentNetwork].alias)
+                        let chainInfo = assets.find(({chain_name}) => chain_name === this.networks.multisend[this.currentNetwork].alias)
 
                         // Get denom info
                         let denomInfo = chainInfo.assets.find(({base}) => base === balance.denom)

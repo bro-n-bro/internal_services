@@ -2,12 +2,12 @@
     <div class="choose_network" ref="target">
         <button class="btn" @click.prevent="showDropdown = !showDropdown">
             <div class="logo">
-                <img :src="getNetworkLogo(store.networks[store.currentNetwork].chainId)" alt="">
+                <img :src="getNetworkLogo(store.networks.multisend[store.currentNetwork].chainId)" alt="">
             </div>
 
             <div>
-                <div class="name">{{ store.networks[store.currentNetwork].name }}</div>
-                <div class="token">{{ store.networks[store.currentNetwork].token_name }}</div>
+                <div class="name">{{ store.networks.multisend[store.currentNetwork].name }}</div>
+                <div class="token">{{ store.networks.multisend[store.currentNetwork].token_name }}</div>
             </div>
 
             <svg class="arr"><use xlink:href="@/assets/sprite.svg#ic_arr_ver"></use></svg>
@@ -16,7 +16,7 @@
 
         <div class="mini_modal" v-show="showDropdown">
             <div class="scroll">
-                <div v-for="(network, index) in store.networks" :key="index">
+                <div v-for="(network, index) in store.networks.multisend" :key="index">
                     <router-link class="network" :class="{ active: store.currentNetwork == network.alias }"
                         :to="`/multisend/${network.alias}`"
                         @click="showDropdown = !showDropdown"

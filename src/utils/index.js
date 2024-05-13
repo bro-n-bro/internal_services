@@ -23,7 +23,7 @@ export const denomTraces = async string => {
     if (hash[0] == 'ibc') {
         try {
             // Request
-            await fetch(`${store.networks[store.currentNetwork].lcd_api}/ibc/apps/transfer/v1/denom_traces/${hash[1]}`)
+            await fetch(`${store.networks.multisend[store.currentNetwork].lcd_api}/ibc/apps/transfer/v1/denom_traces/${hash[1]}`)
                 .then(response => response.json())
                 .then(response => result = response.denom_trace)
         } catch (error) {
@@ -108,11 +108,11 @@ export const sendTx = async (msg, chain) => {
     // })
 
     // RPC endpoint
-    let rpcEndpoint = store.networks[chain].rpc_api
+    let rpcEndpoint = store.networks.multisend[chain].rpc_api
 
     // Fee currencies
     let chainInfos = await window.keplr.getChainInfosWithoutEndpoints(),
-        chainInfo = chainInfos.find(item => item.chainId === store.networks[chain].chainId),
+        chainInfo = chainInfos.find(item => item.chainId === store.networks.multisend[chain].chainId),
         feeCurrencies = chainInfo.feeCurrencies[0]
 
     // Gas price
@@ -136,7 +136,12 @@ export const sendTx = async (msg, chain) => {
 
 // Get metwork logo
 export const getNetworkLogo = chainId => {
-    let logos = chains.find(el => el.chain_id === chainId).images
+    let store = useGlobalStore(),
+        logos = null
+
+    chainId === 'space-pussy'
+        ? logos = store.networks.ibs.space_pussy.images
+        : logos = chains.find(el => el.chain_id === chainId).images
 
     return logos[logos.length - 1].svg ? logos[logos.length - 1].svg : logos[logos.length - 1].png
 }
