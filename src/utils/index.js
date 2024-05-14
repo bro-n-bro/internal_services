@@ -139,9 +139,19 @@ export const getNetworkLogo = chainId => {
     let store = useGlobalStore(),
         logos = null
 
-    chainId === 'space-pussy'
-        ? logos = store.networks.ibs.space_pussy.images
-        : logos = chains.find(el => el.chain_id === chainId).images
+    if (chainId === 'space-pussy') {
+        logos = store.networks.ibs.space_pussy.images
+    } else {
+        let chain = chains.find(el => el.chain_id === chainId),
+            storeNetwork = store.networks.multisend[chain.chain_name]
+
+            console.log(chainId)
+            console.log(storeNetwork)
+
+        storeNetwork.images
+            ? logos = storeNetwork.images
+            : logos = chain.images
+    }
 
     return logos[logos.length - 1].svg ? logos[logos.length - 1].svg : logos[logos.length - 1].png
 }

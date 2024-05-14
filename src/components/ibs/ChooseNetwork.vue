@@ -174,6 +174,11 @@
         font-size: 18px;
         font-weight: 500;
         line-height: 100%;
+
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
 

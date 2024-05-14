@@ -8,13 +8,47 @@ import { getPriceByDenom, formatTokenAmount } from '@/utils'
 import cosmoshub from '@/stores/networks/cosmoshub'
 import osmosis from '@/stores/networks/osmosis'
 import bostrom from '@/stores/networks/bostrom'
+import gravitybridge from '@/stores/networks/gravitybridge'
+import juno from '@/stores/networks/juno'
+import omniflixhub from '@/stores/networks/omniflixhub'
+import stargaze from '@/stores/networks/stargaze'
+import stride from '@/stores/networks/stride'
+import desmos from '@/stores/networks/desmos'
+import agoric from '@/stores/networks/agoric'
+import bandchain from '@/stores/networks/bandchain'
+import celestia from '@/stores/networks/celestia'
+import composable from '@/stores/networks/composable'
+import dymension from '@/stores/networks/dymension'
+import empowerchain from '@/stores/networks/empowerchain'
+import neutron from '@/stores/networks/neutron'
+import qwoyn from '@/stores/networks/qwoyn'
+import saga from '@/stores/networks/saga'
+import seda from '@/stores/networks/seda'
+import evmos from '@/stores/networks/evmos'
 import space_pussy from '@/stores/networks/space_pussy'
 
 const networks = {
     multisend: {
         cosmoshub,
         osmosis,
-        bostrom
+        bostrom,
+        gravitybridge,
+        juno,
+        omniflixhub,
+        stargaze,
+        stride,
+        desmos,
+        agoric,
+        bandchain,
+        celestia,
+        composable,
+        dymension,
+        empowerchain,
+        neutron,
+        qwoyn,
+        saga,
+        seda,
+        evmos
     },
     ibs: {
         space_pussy
@@ -22,8 +56,25 @@ const networks = {
     IBC: {
         cosmoshub,
         osmosis,
-        bostrom
-    },
+        bostrom,
+        gravitybridge,
+        juno,
+        omniflixhub,
+        stargaze,
+        stride,
+        desmos,
+        agoric,
+        bandchain,
+        celestia,
+        composable,
+        dymension,
+        empowerchain,
+        neutron,
+        qwoyn,
+        saga,
+        seda,
+        evmos
+    }
 }
 
 
