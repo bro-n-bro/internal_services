@@ -157,22 +157,20 @@
                     amount: '',
                     denom: ''
                 }]
-            },
+            }
         ]),
         placeholders = ref([
             {
                 coins: [{
                     placeholder: '0'
                 }]
-            },
+            }
         ])
 
 
     onBeforeMount(async () => {
         // Init APP
-        if (!store.isKeplrConnected) {
-            await store.initApp()
-        }
+        await store.initApp()
 
         // Hide loader
         loading.value = false

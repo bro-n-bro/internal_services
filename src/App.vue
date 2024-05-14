@@ -71,6 +71,6 @@
 
     watch(computed(() => store.currentNetwork), async () => {
         // Keplr connect
-        await createKeplrOfflineSinger(store.networks[store.currentNetwork].chainId)
+        await createKeplrOfflineSinger(store.networks.multisend[store.currentNetwork].chainId)
     })
 </script>
