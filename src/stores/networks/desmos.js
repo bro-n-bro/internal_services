@@ -7,6 +7,7 @@ const network = {
     token_name: 'DSM',
     chainId: 'desmos-mainnet',
     prefix: 'desmos',
+    mintscanPrefix: 'desmos',
     alias: 'desmos',
     exponent: 6,
 }

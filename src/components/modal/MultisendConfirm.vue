@@ -145,9 +145,9 @@
                     title: i18n.global.t('message.notification_multisend_success_title'),
                     type: 'success',
                     data: {
-                        chain: store.networks[store.currentNetwork].name,
+                        chain: store.networks.global[store.currentNetwork].name,
                         tx_type: i18n.global.t('message.notification_multisend_action'),
-                        tx_hash: store.networks[store.currentNetwork].prefix != 'bostrom' ? result.transactionHash : null
+                        tx_hash: store.networks.global[store.currentNetwork].mintscanPrefix ? result.transactionHash : null
                     }
                 })
 
@@ -155,7 +155,7 @@
                 emitter.emit('updateBalances')
             } else {
                 // Show error
-                showError(error)
+                showError(result)
             }
         } catch (error) {
             console.error(error)
@@ -172,12 +172,11 @@
     // Show error message
     function showError(error) {
         // Get error code
-        let errorCode = error.message.match(/code (\d+(\.\d)*)/i),
-            errorText = ''
+        let errorText = ''
 
         // Get error title
-        errorCode
-            ? errorText = i18n.global.t(`message.notification_tx_error_${errorCode[1]}`)
+        error.code
+            ? errorText = i18n.global.t(`message.notification_tx_error_${error.code}`)
             : errorText = i18n.global.t('message.notification_tx_error_rejected')
 
         // Show notification
@@ -192,7 +191,7 @@
             text: errorText,
             type: 'error',
             data: {
-                chain: store.networks[store.currentNetwork].name,
+                chain: store.networks.global[store.currentNetwork].name,
                 tx_type: i18n.global.t('message.notification_multisend_action')
             }
         })

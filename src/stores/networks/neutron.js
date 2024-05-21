@@ -12,6 +12,7 @@ const network = {
     token_name: 'NTRN',
     chainId: 'neutron-1',
     prefix: 'neutron',
+    mintscanPrefix: 'neutron',
     alias: 'neutron',
     exponent: 6
 }

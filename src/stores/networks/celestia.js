@@ -7,6 +7,7 @@ const network = {
     token_name: 'TIA',
     chainId: 'celestia',
     prefix: 'celestia',
+    mintscanPrefix: 'celestia',
     alias: 'celestia',
     exponent: 6
 }

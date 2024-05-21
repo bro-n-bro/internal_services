@@ -1,5 +1,9 @@
 <template>
     <div class="main">
+        <!-- Header -->
+        <Header />
+
+
         <div class="cont">
             <div class="grid row">
                 <section class="col">
@@ -14,12 +18,22 @@
             </div>
         </div>
     </div>
+
+
+    <!-- Footer -->
+    <Footer />
+
+
+    <!-- Background -->
+    <img src="@/assets/bg.png" alt="" class="bg" loading="lazy">
 </template>
 
 
 <script setup>
     // Components
+    import Header from '@/components/Header.vue'
     import Actions from '@/components/Actions.vue'
+    import Footer from '@/components/Footer.vue'
 </script>
 
 
@@ -30,19 +44,19 @@
         align-items: stretch;
         justify-content: space-between;
 
-        padding: 40px 0;
+        padding: 20px 0 80px;
     }
 
 
     .col
     {
-        width: 353px;
+        width: 320px;
         max-width: 100%;
     }
 
 
     .col_main
     {
-        width: calc(100% - 393px);
+        width: calc(100% - 360px);
     }
 </style>

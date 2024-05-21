@@ -7,6 +7,7 @@ const network = {
     token_name: 'EVMOS',
     chainId: 'evmos_9001-2',
     prefix: 'evmos',
+    mintscanPrefix: 'evmos',
     alias: 'evmos',
     exponent: 18
 }
