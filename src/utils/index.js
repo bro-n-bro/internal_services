@@ -23,7 +23,7 @@ export const denomTraces = async string => {
     if (hash[0] == 'ibc') {
         try {
             // Request
-            await fetch(`${store.networks.multisend[store.currentNetwork].lcd_api}/ibc/apps/transfer/v1/denom_traces/${hash[1]}`)
+            await fetch(`${store.networks.global[store.currentNetwork].lcd_api}/ibc/apps/transfer/v1/denom_traces/${hash[1]}`)
                 .then(response => response.json())
                 .then(response => result = response.denom_trace)
         } catch (error) {
@@ -144,9 +144,6 @@ export const getNetworkLogo = chainId => {
     } else {
         let chain = chains.find(el => el.chain_id === chainId),
             storeNetwork = store.networks.multisend[chain.chain_name]
-
-            console.log(chainId)
-            console.log(storeNetwork)
 
         storeNetwork.images
             ? logos = storeNetwork.images

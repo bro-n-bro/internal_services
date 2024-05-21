@@ -15,9 +15,9 @@ import stargaze from '@/stores/networks/stargaze'
 import stride from '@/stores/networks/stride'
 import desmos from '@/stores/networks/desmos'
 import agoric from '@/stores/networks/agoric'
-import bandchain from '@/stores/networks/bandchain'
+// import bandchain from '@/stores/networks/bandchain'
 import celestia from '@/stores/networks/celestia'
-import composable from '@/stores/networks/composable'
+// import composable from '@/stores/networks/composable'
 import dymension from '@/stores/networks/dymension'
 import empowerchain from '@/stores/networks/empowerchain'
 import neutron from '@/stores/networks/neutron'
@@ -27,54 +27,28 @@ import seda from '@/stores/networks/seda'
 import evmos from '@/stores/networks/evmos'
 import space_pussy from '@/stores/networks/space_pussy'
 
-const networks = {
-    multisend: {
-        cosmoshub,
-        osmosis,
-        bostrom,
-        gravitybridge,
-        juno,
-        omniflixhub,
-        stargaze,
-        stride,
-        desmos,
-        agoric,
-        bandchain,
-        celestia,
-        composable,
-        dymension,
-        empowerchain,
-        neutron,
-        qwoyn,
-        saga,
-        seda,
-        evmos
-    },
-    ibs: {
-        space_pussy
-    },
-    IBC: {
-        cosmoshub,
-        osmosis,
-        bostrom,
-        gravitybridge,
-        juno,
-        omniflixhub,
-        stargaze,
-        stride,
-        desmos,
-        agoric,
-        bandchain,
-        celestia,
-        composable,
-        dymension,
-        empowerchain,
-        neutron,
-        qwoyn,
-        saga,
-        seda,
-        evmos
-    }
+
+const allNetworks = {
+    cosmoshub,
+    osmosis,
+    bostrom,
+    gravitybridge,
+    juno,
+    omniflixhub,
+    stargaze,
+    stride,
+    desmos,
+    agoric,
+    // bandchain,
+    celestia,
+    // composable,
+    dymension,
+    empowerchain,
+    neutron,
+    qwoyn,
+    saga,
+    seda,
+    evmos
 }
 
 
@@ -89,7 +63,17 @@ export const useGlobalStore = defineStore('global', {
         prices: [],
         balances: [],
 
-        networks,
+        networks: {
+            global: allNetworks,
+
+            multisend: allNetworks,
+
+            IBC: allNetworks,
+
+            ibs: {
+                space_pussy
+            }
+        },
 
         socket: {},
 
@@ -146,10 +130,10 @@ export const useGlobalStore = defineStore('global', {
         async initApp() {
             if (window.keplr) {
                 // Keplr connect
-                await createKeplrOfflineSinger(this.networks.multisend[this.currentNetwork].chainId)
+                await createKeplrOfflineSinger(this.networks.global[this.currentNetwork].chainId)
 
                 // Stargate client
-                this.stargateClient = await SigningStargateClient.connectWithSigner(this.networks.multisend[this.currentNetwork].rpc_api, this.Keplr.offlineSinger)
+                this.stargateClient = await SigningStargateClient.connectWithSigner(this.networks.global[this.currentNetwork].rpc_api, this.Keplr.offlineSinger)
 
                 // Get currencies price
                 await this.getCurrenciesPrice()
@@ -167,7 +151,7 @@ export const useGlobalStore = defineStore('global', {
 
             // try {
             //     // Request
-            //     await fetch(`${this.networks.multisend[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/bostrom1ke7kxdn29w2lrxt9dzusa6shvmwd8xm9gxm2zf`)
+            //     await fetch(`${this.networks.global[this.currentNetwork].lcd_api}/cosmos/bank/v1beta1/balances/bostrom1ke7kxdn29w2lrxt9dzusa6shvmwd8xm9gxm2zf`)
             //         .then(response => response.json())
             //         .then(async response => this.balances = response.balances)
             // } catch (error) {

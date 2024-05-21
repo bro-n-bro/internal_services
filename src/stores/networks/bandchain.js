@@ -7,7 +7,7 @@ const network = {
     token_name: 'BAND',
     chainId: 'laozi-mainnet',
     prefix: 'band',
-    alias: 'band',
+    alias: 'bandchain',
     exponent: 6
 }
 

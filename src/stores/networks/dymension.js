@@ -7,7 +7,7 @@ const network = {
     token_name: 'DYM',
     chainId: 'dymension_1100-1',
     prefix: 'dym',
-    alias: 'dym',
+    alias: 'dymension',
     exponent: 18
 }
 

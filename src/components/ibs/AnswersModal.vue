@@ -17,6 +17,10 @@
                         </template> -->
 
                         {{ message.text }}
+
+                        <!-- <pre>
+                            {{ message.text }}
+                        </pre> -->
                     </div>
                 </div>
 
@@ -64,6 +68,8 @@
             //     })
             // }
 
+            console.log(e.data + e.data.length)
+
             wsMessages.value.push({
                 text: e.data,
                 type: 'text'
@@ -110,6 +116,12 @@
     .list > * + *
     {
         margin-top: 20px;
+    }
+
+
+    pre
+    {
+        white-space: pre-wrap;
     }
 
 
