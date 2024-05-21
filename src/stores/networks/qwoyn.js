@@ -7,6 +7,7 @@ const network = {
     token_name: 'QWOYN',
     chainId: 'qwoyn-1',
     prefix: 'qwoyn',
+    mintscanPrefix: null,
     alias: 'qwoyn',
     exponent: 6
 }

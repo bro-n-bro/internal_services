@@ -7,6 +7,7 @@ const network = {
     token_name: 'SAGA',
     chainId: 'ssc-1',
     prefix: 'saga',
+    mintscanPrefix: 'saga',
     alias: 'saga',
     exponent: 6
 }

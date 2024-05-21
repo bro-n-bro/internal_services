@@ -12,6 +12,7 @@ const network = {
     token_name: 'MPWR',
     chainId: 'empowerchain-1',
     prefix: 'empower',
+    mintscanPrefix: null,
     alias: 'empowerchain',
     exponent: 6
 }

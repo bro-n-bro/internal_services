@@ -100,13 +100,6 @@ export const createKeplrOfflineSinger = async chainId => {
 export const sendTx = async (msg, chain) => {
     let store = useGlobalStore()
 
-    // Create signer
-    // let offlineSigner = await window.getOfflineSignerAuto(store.networks[chain].chainId)
-
-    // Object.assign(offlineSigner, {
-    //     signAmino: offlineSigner.signAmino ?? offlineSigner.sign
-    // })
-
     // RPC endpoint
     let rpcEndpoint = store.networks.multisend[chain].rpc_api
 

@@ -10,6 +10,10 @@ export default {
             'networks_title': 'Select network',
 
 
+            // Actions
+            'actions_title': 'Apps',
+
+
             // Multisend form
             'multisend_page_title': 'Multisend in {network}',
 
@@ -27,6 +31,11 @@ export default {
             // IBC route
             'ibc_route_page_title': 'IBC route',
             'ibc_empty_title': 'No tokens available',
+
+
+            // Footer
+            'footer_title': 'Have questions? Feel free to contact with us.',
+            'footer_copyright': 'Bro & Bro team, 2024',
 
 
             // Buttons

@@ -7,6 +7,7 @@ const network = {
     token_name: 'BAND',
     chainId: 'laozi-mainnet',
     prefix: 'band',
+    mintscanPrefix: 'band',
     alias: 'bandchain',
     exponent: 6
 }

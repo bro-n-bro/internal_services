@@ -39,6 +39,7 @@
     </template>
 
 
+    <!-- Answers modal -->
     <AnswersModal v-if="showAnswersModal" />
 </template>
 
@@ -170,168 +171,163 @@
 
 
 <style scoped>
-.row
-{
-    align-content: stretch;
-    align-items: stretch;
+    .row
+    {
+        align-content: stretch;
+        align-items: stretch;
 
-    margin-bottom: -24px;
-    margin-left: -24px;
-}
-
-
-.row > *
-{
-    width: calc(50% - 24px);
-    margin-bottom: 24px;
-    margin-left: 24px;
-}
+        margin-bottom: -24px;
+        margin-left: -24px;
+    }
 
 
-.section
-{
-    padding: 23px;
-
-    border: 1px solid #950fff;
-    border-radius: 14px;
-}
-
-
-.section .title
-{
-    font-size: 20px;
-
-    display: flex;
-    align-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    margin-bottom: 20px;
-
-    text-align: center;
-}
+    .row > *
+    {
+        width: calc(50% - 24px);
+        margin-bottom: 24px;
+        margin-left: 24px;
+    }
 
 
-.section .title span
-{
-    display: block;
+    .section
+    {
+        padding: 23px;
 
-    text-transform: lowercase;
-}
-
-.section .title span::first-letter
-{
-    text-transform: uppercase;
-}
+        border: 1px solid #950fff;
+        border-radius: 14px;
+    }
 
 
-.section .title .sep
-{
-    margin: 0 12px;
-}
+    .section .title
+    {
+        font-size: 20px;
+
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        margin-bottom: 20px;
+
+        text-align: center;
+    }
 
 
-.commands
-{
-    display: flex;
-    align-content: stretch;
-    align-items: stretch;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    .section .title span
+    {
+        display: block;
 
-    margin-bottom: -10px;
-    margin-left: -10px;
-}
+        text-transform: lowercase;
+    }
 
-
-.commands input
-{
-    display: none;
-}
+    .section .title span::first-letter
+    {
+        text-transform: uppercase;
+    }
 
 
-.commands label
-{
-    display: block;
-
-    width: calc(50% - 10px);
-    margin-bottom: 10px;
-    margin-left: 10px;
-
-    cursor: pointer;
-
-    border-radius: 10px;
-}
+    .section .title .sep
+    {
+        margin: 0 12px;
+    }
 
 
-.commands label > *
-{
-    pointer-events: none;
-}
+    .commands
+    {
+        display: flex;
+        align-content: stretch;
+        align-items: stretch;
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        margin-bottom: -10px;
+        margin-left: -10px;
+    }
 
 
-.commands label div
-{
-    display: flex;
-    align-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    min-height: 48px;
-    padding: 9px;
-
-    transition: .2s linear;
-    text-align: center;
-
-    border: 1px solid transparent;
-    border-radius: 10px;
-    background: #191919;
-}
+    .commands input
+    {
+        display: none;
+    }
 
 
-.commands input:checked + div
-{
-    border-color: #950fff;
-}
+    .commands label
+    {
+        display: block;
+
+        width: calc(50% - 10px);
+        margin-bottom: 10px;
+        margin-left: 10px;
+
+        cursor: pointer;
+
+        border-radius: 10px;
+    }
 
 
-.execute_btn
-{
-    font-weight: 500;
-    line-height: 19px;
-
-    display: block;
-
-    width: 100%;
-    height: 48px;
-    margin-top: 20px;
-    padding: 10px;
-
-    transition: .2s linear;
-
-    color: #fff;
-    border-radius: 14px;
-    background: #950fff;
-}
-
-.execute_btn:disabled
-{
-    cursor: default;
-    pointer-events: none;
-
-    opacity: .5;
-}
+    .commands label > *
+    {
+        pointer-events: none;
+    }
 
 
-.execute_btn:hover
-{
-    background: #7700e1;
-}
+    .commands label div
+    {
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        min-height: 48px;
+        padding: 9px;
+
+        transition: .2s linear;
+        text-align: center;
+
+        border: 1px solid transparent;
+        border-radius: 10px;
+        background: #191919;
+    }
 
 
+    .commands input:checked + div
+    {
+        border-color: #950fff;
+    }
 
 
+    .execute_btn
+    {
+        font-weight: 500;
+        line-height: 19px;
 
+        display: block;
+
+        width: 100%;
+        height: 48px;
+        margin-top: 20px;
+        padding: 10px;
+
+        transition: .2s linear;
+
+        color: #fff;
+        border-radius: 14px;
+        background: #950fff;
+    }
+
+    .execute_btn:disabled
+    {
+        cursor: default;
+        pointer-events: none;
+
+        opacity: .5;
+    }
+
+
+    .execute_btn:hover
+    {
+        background: #7700e1;
+    }
 </style>

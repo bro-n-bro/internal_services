@@ -18,7 +18,7 @@
                 <div v-for="(network, index) in networks" :key="index">
                     <button class="network" :class="{ active: currentNetwork.chain_id == network.chain_id }" @click.prevent="setCurrentNetwork(index)">
                         <div class="logo">
-                            <img :src="getNetworkLogo(network.chain_id)" alt="">
+                            <img :src="getNetworkLogo(network.chain_id)" alt="" loading="lazy">
                         </div>
 
                         <div>

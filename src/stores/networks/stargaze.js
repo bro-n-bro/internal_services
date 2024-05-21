@@ -6,7 +6,8 @@ const network = {
     denom: 'ustars',
     token_name: 'STARS',
     chainId: 'stargaze-1',
-    prefix: 'stargaze',
+    prefix: 'stars',
+    mintscanPrefix: 'stargaze',
     alias: 'stargaze',
     exponent: 6,
 }

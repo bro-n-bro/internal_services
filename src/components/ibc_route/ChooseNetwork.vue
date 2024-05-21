@@ -22,7 +22,7 @@
                         @click="showDropdown = !showDropdown"
                     >
                         <div class="logo">
-                            <img :src="getNetworkLogo(network.chainId)" alt="">
+                            <img :src="getNetworkLogo(network.chainId)" alt="" loading="lazy">
                         </div>
 
                         <div>

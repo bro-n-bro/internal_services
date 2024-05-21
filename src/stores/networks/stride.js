@@ -7,6 +7,7 @@ const network = {
     token_name: 'STRD',
     chainId: 'stride-1',
     prefix: 'stride',
+    mintscanPrefix: 'stride',
     alias: 'stride',
     exponent: 6,
 }

@@ -7,6 +7,7 @@ const network = {
     token_name: 'FLIX',
     chainId: 'omniflixhub-1',
     prefix: 'omniflix',
+    mintscanPrefix: 'omniflix',
     alias: 'omniflixhub',
     exponent: 6
 }

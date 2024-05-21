@@ -7,6 +7,7 @@ const network = {
     token_name: 'SEDA',
     chainId: 'seda-1',
     prefix: 'seda',
+    mintscanPrefix: null,
     alias: 'seda',
     exponent: 18
 }

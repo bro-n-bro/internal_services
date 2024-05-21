@@ -7,6 +7,7 @@ const network = {
     token_name: 'BLD',
     chainId: 'agoric-3',
     prefix: 'agoric',
+    mintscanPrefix: null,
     alias: 'agoric',
     exponent: 6
 }

@@ -7,6 +7,7 @@ const network = {
     token_name: 'JUNO',
     chainId: 'juno-1',
     prefix: 'juno',
+    mintscanPrefix: 'juno',
     alias: 'juno',
     exponent: 6,
 }
