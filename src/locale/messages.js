@@ -26,6 +26,7 @@ export default {
 
             // IBC route
             'ibc_route_page_title': 'IBC route',
+            'ibc_empty_title': 'No tokens available',
 
 
             // Buttons

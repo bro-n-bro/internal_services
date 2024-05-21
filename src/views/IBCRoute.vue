@@ -13,7 +13,7 @@
 
     <!-- <pre>{{ store.balances }}</pre> -->
 
-    <div class="list">
+    <div class="list" v-if="store.balances.length">
         <div class="item" v-for="(balance, index) in store.balances" :key="index">
             <div class="row">
                 <div class="amount">
@@ -56,6 +56,10 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="empty" v-else>
+        {{ $t('message.ibc_empty_title') }}
     </div>
     </template>
 </template>
@@ -106,7 +110,7 @@
 
 
     // Get paths
-    function getPaths() {
+    async function getPaths() {
         store.balances.forEach(async balance => {
             // Return path
             balance.return_path = []
@@ -151,143 +155,148 @@
 
 
 <style scoped>
-.loader_wrap
-{
-    position: relative;
+    .loader_wrap
+    {
+        position: relative;
 
-    padding: 40px;
+        padding: 40px;
 
-    background: none;
-}
-
-
-.item + .item
-{
-    margin-top: 40px;
-}
+        background: none;
+    }
 
 
-.item .amount
-{
-    margin-bottom: 12px;
-
-    text-transform: uppercase;
-}
+    .item + .item
+    {
+        margin-top: 40px;
+    }
 
 
-.item .denom
-{
-    margin-bottom: 12px;
-    margin-left: 4px;
+    .item .amount
+    {
+        margin-bottom: 12px;
 
-    text-transform: uppercase;
-}
-
-
-.item .path .label
-{
-    font-size: 14px;
-
-    margin-bottom: 4px;
-
-    opacity: .5;
-}
+        text-transform: uppercase;
+    }
 
 
-.item .return_path
-{
-    margin-top: 16px;
-}
+    .item .denom
+    {
+        margin-bottom: 12px;
+        margin-left: 4px;
+
+        text-transform: uppercase;
+    }
 
 
-.item .return_path .title
-{
-    margin-bottom: 8px;
-}
+    .item .path .label
+    {
+        font-size: 14px;
+
+        margin-bottom: 4px;
+
+        opacity: .5;
+    }
 
 
-.item .return_path .row
-{
-    margin-left: -60px;
-}
+    .item .return_path
+    {
+        margin-top: 16px;
+    }
 
 
-.item .return_path .row > *
-{
-    position: relative;
-
-    margin-left: 60px;
-}
+    .item .return_path .title
+    {
+        margin-bottom: 8px;
+    }
 
 
-.item .return_path .row > * + *:before
-{
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -40px;
-
-    display: block;
-
-    width: 20px;
-    height: 1px;
-    margin: auto 0;
-
-    content: '';
-    pointer-events: none;
-
-    background: currentColor;
-}
-
-.item .return_path .row > * + *:after
-{
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -29px;
-
-    display: block;
-
-    width: 9px;
-    height: 9px;
-    margin: auto 0;
-
-    content: '';
-    transform: rotate(135deg);
-    pointer-events: none;
-
-    border-top: 1px solid;
-    border-left: 1px solid;
-}
+    .item .return_path .row
+    {
+        margin-left: -60px;
+    }
 
 
-.item .return_path .row > * > *
-{
-    display: flex;
-    align-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-}
+    .item .return_path .row > *
+    {
+        position: relative;
 
-.item .return_path .row > * > * + *
-{
-    margin-top: 4px;
-}
+        margin-left: 60px;
+    }
 
 
-.item .return_path .label
-{
-    font-size: 14px;
+    .item .return_path .row > * + *:before
+    {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -40px;
 
-    align-self: center;
+        display: block;
 
-    margin-right: 8px;
+        width: 20px;
+        height: 1px;
+        margin: auto 0;
 
-    opacity: .5;
-}
+        content: '';
+        pointer-events: none;
+
+        background: currentColor;
+    }
+
+    .item .return_path .row > * + *:after
+    {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -29px;
+
+        display: block;
+
+        width: 9px;
+        height: 9px;
+        margin: auto 0;
+
+        content: '';
+        transform: rotate(135deg);
+        pointer-events: none;
+
+        border-top: 1px solid;
+        border-left: 1px solid;
+    }
+
+
+    .item .return_path .row > * > *
+    {
+        display: flex;
+        align-content: flex-start;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .item .return_path .row > * > * + *
+    {
+        margin-top: 4px;
+    }
+
+
+    .item .return_path .label
+    {
+        font-size: 14px;
+
+        align-self: center;
+
+        margin-right: 8px;
+
+        opacity: .5;
+    }
 
 
 
+    .empty
+    {
+        text-align: center;
 
+        color: #cecece;
+    }
 </style>

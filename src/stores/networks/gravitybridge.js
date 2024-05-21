@@ -7,7 +7,7 @@ const network = {
     token_name: 'GRAV',
     chainId: 'gravity-bridge-3',
     prefix: 'gravity',
-    alias: 'gravity',
+    alias: 'gravitybridge',
     exponent: 6
 }
 

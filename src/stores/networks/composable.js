@@ -7,7 +7,7 @@ const network = {
     token_name: 'PICA',
     chainId: 'centauri-1',
     prefix: 'pica',
-    alias: 'pica',
+    alias: 'composable',
     exponent: 12
 }
 
