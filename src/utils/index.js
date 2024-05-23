@@ -12,7 +12,7 @@ export const generateAddress = (prefix, address) => {
 
 
 // Denom traces
-export const denomTraces = async string => {
+export const denomTraces = async (string, currentNetwork) => {
     let store = useGlobalStore(),
         result = {
             path: null,
@@ -23,7 +23,7 @@ export const denomTraces = async string => {
     if (hash[0] == 'ibc') {
         try {
             // Request
-            await fetch(`${store.networks.global[store.currentNetwork].lcd_api}/ibc/apps/transfer/v1/denom_traces/${hash[1]}`)
+            await fetch(`${store.networks.global[currentNetwork].lcd_api}/ibc/apps/transfer/v1/denom_traces/${hash[1]}`)
                 .then(response => response.json())
                 .then(response => result = response.denom_trace)
         } catch (error) {
@@ -133,10 +133,10 @@ export const getNetworkLogo = chainId => {
         logos = null
 
     if (chainId === 'space-pussy') {
-        logos = store.networks.ibs.space_pussy.images
+        logos = store.networks.ibc_recovery.space_pussy.images
     } else {
         let chain = chains.find(el => el.chain_id === chainId),
-            storeNetwork = store.networks.multisend[chain.chain_name]
+            storeNetwork = store.networks.global[chain.chain_name]
 
         storeNetwork.images
             ? logos = storeNetwork.images

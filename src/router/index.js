@@ -22,9 +22,9 @@ const routes = [
 		}
 	},
 	{
-		path: '/ibs',
-		name: 'IBS',
-		component: () => import('../views/IBS.vue'),
+		path: '/ibc_recovery',
+		name: 'IBCRecovery',
+		component: () => import('../views/IBCRecovery.vue'),
 		meta: {
 			layout: defaultLayout
 		}
@@ -43,18 +43,6 @@ const routes = [
 const router = createRouter({
 	history: createWebHistory(),
 	routes
-})
-
-
-router.beforeResolve(async (to, from, next) => {
-	let store = useGlobalStore()
-
-	// Current network from url
-	if (to.params.network) {
-		store.currentNetwork = to.params.network
-	}
-
-	next()
 })
 
 

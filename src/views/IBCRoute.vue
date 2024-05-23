@@ -2,17 +2,6 @@
     <Loader v-if="loading" />
 
     <template v-else>
-    <div class="page_head">
-        <div class="page_title">
-            {{ $t('message.ibc_route_page_title') }}
-        </div>
-
-        <!-- Choose network -->
-        <ChooseNetwork />
-    </div>
-
-    <!-- <pre>{{ store.balances }}</pre> -->
-
     <div class="list" v-if="store.balances.length">
         <div class="item" v-for="(balance, index) in store.balances" :key="index">
             <div class="row">
@@ -68,23 +57,28 @@
 <script setup>
     import { ref, onBeforeMount, watch, computed } from 'vue'
     import { useGlobalStore } from '@/stores'
+    import { useRoute } from 'vue-router'
     import { chains } from 'chain-registry'
     import { formatTokenAmount, formatTokenName } from '@/utils'
 
     // Components
     import Loader from '@/components/Loader.vue'
-    import ChooseNetwork  from '@/components/ibc_route/ChooseNetwork.vue'
 
 
     const store = useGlobalStore(),
+        route = useRoute(),
         loading = ref(true)
 
 
     onBeforeMount(async () => {
+        // Set current service
+        store.currentService = route.name
+
+        // Set current multisend network
+        store.IBCRouteCurrentNetwork = route.params.network
+
         // Init APP
-        if (!store.isKeplrConnected) {
-            await store.initApp()
-        }
+        await store.initApp(store.IBCRouteCurrentNetwork)
 
         // Get paths
         await getPaths()
@@ -98,8 +92,11 @@
         // Show loader
         loading.value = true
 
-        // Reinit APP
-        await store.initApp()
+        // Set current multisend network
+        store.IBCRouteCurrentNetwork = route.params.network
+
+        // Init APP
+        await store.initApp(store.IBCRouteCurrentNetwork)
 
         // Get paths
         await getPaths()
@@ -118,7 +115,7 @@
             if (balance.denom_traces.path) {
                 // Set default network
                 balance.return_path.push({
-                    chain_name: store.networks.IBC[store.currentNetwork].name,
+                    chain_name: store.networks.IBC[store.IBCRouteCurrentNetwork].name,
                 })
 
                 for (const item of balance.denom_traces.path.match(/transfer\/channel-\d+/g)) {
@@ -128,7 +125,7 @@
                     }
 
                     // Get connection
-                    await fetch(`${store.networks.IBC[store.currentNetwork].lcd_api}/ibc/core/channel/v1/channels/${data.channel}/ports/transfer`)
+                    await fetch(`${store.networks.IBC[store.IBCRouteCurrentNetwork].lcd_api}/ibc/core/channel/v1/channels/${data.channel}/ports/transfer`)
                         .then(response => response.json())
                         .then(result => {
                             data.connection = result.channel.connection_hops[0]
@@ -136,7 +133,7 @@
                         })
 
                     // Get chain id
-                    await fetch(`${store.networks.IBC[store.currentNetwork].lcd_api}/ibc/core/connection/v1/connections/${data.connection}/client_state`)
+                    await fetch(`${store.networks.IBC[store.IBCRouteCurrentNetwork].lcd_api}/ibc/core/connection/v1/connections/${data.connection}/client_state`)
                         .then(response => response.json())
                         .then(result => data.chain_id = result.identified_client_state.client_state.chain_id)
 

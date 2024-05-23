@@ -3,16 +3,16 @@
         <div class="modal_content">
             <div class="data">
                 <div class="modal_title">
-                    {{ $t('message.ibs_modal_title') }}
+                    {{ $t('message.ibc_recovery_modal_title') }}
                 </div>
 
                 <pre class="list" v-if="wsMessages.length"><div v-for="(message, index) in wsMessages" :key="index">{{ message }}</div></pre>
 
                 <div class="processing" v-if="processing">
-                    {{ $t('message.ibs_modal_processing') }}
+                    {{ $t('message.ibc_recovery_modal_processing') }}
                 </div>
 
-                <button class="btn" v-else @click.self="emitter.emit('closeIBSAnswersModal')">
+                <button class="btn" v-else @click.self="emitter.emit('closeIBCRecoveryAnswersModal')">
                     {{ $t('message.btn_close') }}
                 </button>
             </div>
@@ -62,6 +62,8 @@
 
     pre
     {
+        font-size: 14px;
+
         padding: 9px 19px;
 
         white-space: pre-wrap;
@@ -76,7 +78,6 @@
     {
         margin-top: 8px;
     }
-
 
 
     .processing

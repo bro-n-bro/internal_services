@@ -15,16 +15,21 @@ export default {
 
 
             // Multisend form
-            'multisend_page_title': 'Multisend in {network}',
-
             'multisend_form_to_address_label': 'Address of the recipient',
             'multisend_form_amount_label': 'Amount',
-            'multisend_form_from_label': 'From',
+            'multisend_form_from_label': 'Denom',
 
 
-            // IBS
-            'ibs_modal_title': 'Logs :',
-            'ibs_modal_processing': 'Processing...',
+            // Multisend confirm
+            'multisend_confirm_title': 'Details',
+            'multisend_confirm_address_label': 'Recipient',
+            'multisend_confirm_denom_label': 'Denom',
+            'multisend_confirm_amount_label': 'Amount',
+
+
+            // IBC Recovery
+            'ibc_recovery_modal_title': 'Logs :',
+            'ibc_recovery_modal_processing': 'Processing...',
 
 
             // IBC route

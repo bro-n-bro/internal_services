@@ -1,19 +1,17 @@
 <template>
-    <div class="page_head">
-        <div class="page_title">
-            {{ $t('message.multisend_page_title', { network : store.networks.multisend[store.currentNetwork].name }) }}
-        </div>
-
-        <!-- Choose network -->
-        <ChooseNetwork />
-    </div>
-
     <Loader v-if="loading" />
 
     <form v-else action="" class="form" :class="{ processing: processing }" @submit.prevent="onSubmit()">
+        <div class="head">
+            <label class="import_btn">
+                <input type="file" name="import_file" accept=".csv" @change="importCSV($event)">
+                <div>{{ $t('message.btn_import_csv') }}</div>
+            </label>
+        </div>
+
         <div class="item" v-for="(item, itemIndex) in data" :key="itemIndex">
             <button type="button" class="delete_btn" v-if="itemIndex" @click="deleteItem(itemIndex)">
-                <svg><use xlink:href="@/assets/sprite.svg#ic_close"></use></svg>
+                <img src="@/assets/ic_remove.svg" alt="">
             </button>
 
             <div class="line">
@@ -27,8 +25,10 @@
             </div>
 
             <div class="columns" v-for="(coin, coinIndex) in item.coins" :key="coinIndex">
+                <div class="connection"></div>
+
                 <div class="line from">
-                    <div class="label">
+                    <div class="label grey">
                         {{ $t('message.multisend_form_from_label') }}
                     </div>
 
@@ -74,7 +74,7 @@
                 </div>
 
                 <div class="line amount">
-                    <div class="label">
+                    <div class="label grey">
                         {{ $t('message.multisend_form_amount_label') }}
                     </div>
 
@@ -88,31 +88,26 @@
                 </div>
 
                 <button type="button" class="add_btn" v-if="!coinIndex" @click="addCoinToItem(itemIndex)">
-                    <svg><use xlink:href="@/assets/sprite.svg#ic_close"></use></svg>
+                    <img src="@/assets/ic_plus.svg" alt="">
                 </button>
 
                 <button type="button" class="delete_btn" v-if="coinIndex" @click="deleteCoinInItem(itemIndex, coinIndex)">
-                    <svg><use xlink:href="@/assets/sprite.svg#ic_close"></use></svg>
+                    <img src="@/assets/ic_delete.svg" alt="">
                 </button>
             </div>
         </div>
 
 
         <div class="line add_items">
-            <input type="number" v-model="add_amount" class="input">
-
-            <button type="button" class="btn" @click="addItems()">
+            <button type="button" class="btn" @click="addItem()">
                 {{ $t('message.btn_add') }}
             </button>
 
             <button type="button" class="clear_btn" v-if="data.length > 5" @click.prevent="resetData()">
-                {{ $t('message.btn_clear_all') }}
-            </button>
+                <span>{{ $t('message.btn_clear_all') }}</span>
 
-            <label class="import_btn">
-                <input type="file" name="import_file" accept=".csv" @change="importCSV($event)">
-                <div>{{ $t('message.btn_import_csv') }}</div>
-            </label>
+                <svg class="icon"><use xlink:href="@/assets/sprite.svg#ic_trash"></use></svg>
+            </button>
         </div>
 
 
@@ -133,12 +128,12 @@
     import { ref, onBeforeMount, onMounted, onBeforeUnmount, inject, watch, computed } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { useNotification } from '@kyvg/vue3-notification'
+    import { useRoute } from 'vue-router'
     import { formatTokenAmount, formatTokenName } from '@/utils'
     import Papa from 'papaparse'
 
     // Components
     import Loader from '@/components/Loader.vue'
-    import ChooseNetwork  from '@/components/multisend/ChooseNetwork.vue'
     import ConfirmModal  from '@/components/modal/MultisendConfirm.vue'
 
 
@@ -146,9 +141,9 @@
         i18n = inject('i18n'),
         notification = useNotification(),
         emitter = inject('emitter'),
+        route = useRoute(),
         loading = ref(true),
         processing = ref(false),
-        add_amount = ref(1),
         showConfirmModal = ref(false),
         data = ref([
             {
@@ -169,23 +164,32 @@
 
 
     onBeforeMount(async () => {
+        // Set current service
+        store.currentService = route.name
+
+        // Set current multisend network
+        store.multisendCurrentNetwork = route.params.network
+
         // Init APP
-        await store.initApp()
+        await store.initApp(store.multisendCurrentNetwork)
 
         // Hide loader
         loading.value = false
     })
 
 
-    watch(computed(() => store.currentNetwork), async () => {
+    watch(computed(() => route.params.network), async () => {
         // Show loader
         loading.value = true
 
         // Reset data
         resetData()
 
+        // Set current multisend network
+        store.multisendCurrentNetwork = route.params.network
+
         // Reinit APP
-        await store.initApp()
+        await store.initApp(store.multisendCurrentNetwork)
 
         // Hide loader
         loading.value = false
@@ -325,15 +329,6 @@
                 placeholders.value[itemindex].coins[coinIndex].placeholder = (formatTokenAmount(balance.amount, balance.base_denom) - used)
             })
         })
-    }
-
-
-    // Add items
-    function addItems() {
-        for (var i = 0; i < add_amount.value; i++) {
-            // Add item
-            addItem()
-        }
     }
 
 
@@ -636,148 +631,93 @@
     }
 
 
-    .item
+    .form
     {
         position: relative;
+        z-index: 3;
 
-        padding-right: 52px;
-    }
+        width: 780px;
+        max-width: 100%;
 
-    .item + .item
-    {
-        margin-top: 20px;
-        padding-top: 40px;
-
-        border-top: 1px solid rgba(255,255,255,.2);
+        border-radius: 30px;
     }
 
 
-    .item .columns
-    {
-        position: relative;
-
-        padding-right: 52px;
-        padding-left: 20%;
-    }
-
-
-    .item .columns:before
+    .form:before
     {
         position: absolute;
-        top: -20px;
-        left: 68px;
+        z-index: -1;
+        top: 0;
+        left: 0;
 
         display: block;
 
-        width: 104px;
-        height: 74px;
+        width: 100%;
+        height: 100%;
 
         content: '';
-        pointer-events: none;
 
-        border-bottom: 1px dashed rgba(255, 255, 255, .2);
-        border-left: 1px dashed rgba(255, 255, 255, .2);
-    }
+        opacity: .7;
+        border: 1px solid #915cd4;
+        border-radius: inherit;
+        background: radial-gradient(82.21% 105.43% at 50% 13.3%, rgba(71, 26, 146, .70) 0%, rgba(35, 6, 83, .70) 63.74%, rgba(0, 0, 0, .70) 100%), linear-gradient(132deg, #8f00b0 -12.79%, #570099 45.8%, #1b0044 99.42%);
 
-    .item .columns + .columns:before
-    {
-        top: -46px;
-
-        height: 100px;
+                backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
     }
 
 
-    .add_btn,
-    .delete_btn
+    .head
     {
-        position: absolute;
-        top: 36px;
-        right: 0;
+        position: relative;
+        position: relative;
+        z-index: 3;
 
         display: flex;
         align-content: center;
         align-items: center;
         flex-wrap: wrap;
-        justify-content: center;
+        justify-content: flex-start;
 
-        width: 32px;
-        height: 32px;
-        margin-left: 20px;
-
-        transition: .2s linear;
-
-        border: 1px solid #950fff;
-        border-radius: 50%;
-    }
-
-    .item + .item > .delete_btn
-    {
-        top: 76px;
-    }
-
-    .item .columns .delete_btn
-    {
-        border: none;
+        padding: 20px 30px 10px;
     }
 
 
-    .add_btn svg,
-    .delete_btn svg
+    .head:after
     {
-        display: block;
-
-        width: 20px;
-        height: 20px;
-    }
-
-    .add_btn svg
-    {
-        transform: rotate(45deg);
-    }
-
-
-    .add_btn:hover,
-    .delete_btn:hover
-    {
-        background: #950fff;
-    }
-
-
-
-    .clear_btn
-    {
-        font-weight: 500;
-        line-height: 19px;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
 
         display: block;
 
-        height: 55px;
-        margin-left: 40px;
-        padding: 9px 23px;
+        width: 100%;
+        height: 1px;
+        margin: 0 auto;
 
-        transition: .2s linear;
+        content: '';
 
-        color: #f81c41;
-        border: 1px solid #f81c41;
-        border-radius: 14px;
+        background: linear-gradient(to right,  rgba(255,255,255,0) 0%,rgba(250,195,255,.63) 50%,rgba(255,255,255,0) 100%);
     }
-
-
-    .clear_btn:hover
-    {
-        color: #fff;
-        background: #f81c41;
-    }
-
 
 
     .import_btn
     {
+        font-size: 20px;
+        font-weight: 600;
+
         display: block;
 
         margin-left: auto;
 
         cursor: pointer;
+
+        background: linear-gradient(135deg,  #d57cff 0%,#520c97 100%);
+        -webkit-background-clip: text;
+                background-clip: text;
+
+        -webkit-text-fill-color: transparent;
     }
 
 
@@ -787,10 +727,130 @@
     }
 
 
-    .import_btn div
+    .item
     {
-        font-weight: 500;
-        line-height: 19px;
+        position: relative;
+        padding: 20px 30px;
+    }
+
+    .item + .item
+    {
+        padding-top: 0;
+        padding-right: 92px;
+    }
+
+
+    .item + .item > .delete_btn
+    {
+        top: 26px;
+        right: 30px;
+    }
+
+    .item + .item > .delete_btn img
+    {
+        width: 32px;
+        height: 32px;
+    }
+
+
+    .item .columns
+    {
+        position: relative;
+
+        padding-right: 62px;
+        padding-left: 84px;
+    }
+
+
+    .item .connection
+    {
+        position: absolute;
+        bottom: 46px;
+        left: 22px;
+
+        display: block;
+
+        width: 62px;
+        height: 71px;
+
+        content: '';
+        pointer-events: none;
+
+        border-bottom: 1px dashed #8425da;
+        border-left: 1px dashed #8425da;
+    }
+
+
+    .item .connection:before,
+    .item .connection:after
+    {
+        position: absolute;
+        z-index: 1;
+        right: -2px;
+        bottom: -3px;
+
+        display: block;
+
+        width: 5px;
+        height: 5px;
+
+        content: '';
+        pointer-events: none;
+
+        border-radius: 50px;
+        background: #8425da;
+    }
+
+    .item .connection:before
+    {
+        top: -1px;
+        right: auto;
+        bottom: auto;
+        left: -3px;
+    }
+
+
+    .item .columns + .columns .connection
+    {
+        height: 98px;
+    }
+
+
+    .add_items
+    {
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+
+        padding: 0 30px;
+    }
+
+
+    .add_items .btn
+    {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 100%;
+
+        display: block;
+
+        width: 100%;
+        height: 52px;
+
+        color: #8425da;
+        border: 2px solid #762cb9;
+        border-radius: 14px;
+    }
+
+
+    .add_btn,
+    .delete_btn
+    {
+        position: absolute;
+        top: 26px;
+        right: 0;
 
         display: flex;
         align-content: center;
@@ -798,19 +858,70 @@
         flex-wrap: wrap;
         justify-content: center;
 
-        height: 55px;
-        padding: 9px 23px;
+        width: 48px;
+        height: 48px;
+    }
+
+
+    .add_btn img,
+    .delete_btn img
+    {
+        display: block;
+
+        width: 32px;
+        height: 32px;
+    }
+
+    .delete_btn img
+    {
+        width: 16px;
+        height: 16px;
+    }
+
+
+
+    .clear_btn
+    {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 100%;
+
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        width: 158px;
+        min-width: 158px;
+        height: 52px;
+        margin-left: 22px;
 
         transition: .2s linear;
-        text-align: center;
+        white-space: nowrap;
 
-        border: 1px solid #950fff;
+        color: #470072;
+        border: 1px solid #762cb9;
         border-radius: 14px;
+        background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
     }
 
 
-    .import_btn:hover div
+    .clear_btn .icon
     {
-        background: #950fff;
+        display: block;
+
+        width: 20px;
+        height: 20px;
+        margin-left: 8px;
     }
+
+
+    .clear_btn:hover
+    {
+        color: #8425da;
+        border: none;
+        background: #fff;
+    }
+
 </style>

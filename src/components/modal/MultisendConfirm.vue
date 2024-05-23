@@ -1,5 +1,5 @@
 <template>
-    <section class="modal" id="deposit_modal">
+    <section class="modal">
         <div class="modal_content" @click.self="emitter.emit('closeMultisendConfirmModal', { status: false })">
             <div class="data">
                 <button class="close_btn" @click.prevent="emitter.emit('closeMultisendConfirmModal', { status: false })">
@@ -7,8 +7,8 @@
                 </button>
 
 
-                <div class="titles">
-                    <div class="col_address">Sender</div>
+                <div class="modal_title">
+                    {{ $t('message.multisend_confirm_title') }}
                 </div>
 
                 <div class="sender">
@@ -16,20 +16,43 @@
                 </div>
 
 
-                <div class="titles">
-                    <div class="col_address">Recipient</div>
-                    <div class="col_denom">Denom</div>
-                    <div class="col_amount">Amount</div>
-                </div>
+                <div class="list">
+                    <div class="recipient" v-for="item in data" :key="itemIndex">
+                        <div class="col_address">
+                            <div class="label">
+                                {{ $t('message.multisend_confirm_address_label') }}
+                            </div>
 
-                <div class="recipient" v-for="item in data" :key="itemIndex">
-                    <div class="col_address">{{ item.address }}</div>
+                            <div class="val">
+                                {{ item.address.slice(0, 9) + '...' + item.address.slice(-6) }}</div>
+                        </div>
 
-                    <div class="coins" v-for="coin in item.coins" :key="coinIndex">
-                        <div class="col_denom">{{ formatTokenName(coin.denom) }}</div>
-                        <div class="col_amount">{{ coin.amount }}</div>
+                        <div class="coins">
+                            <div class="col_denom">
+                                <div class="label">
+                                    {{ $t('message.multisend_confirm_denom_label') }}
+                                </div>
+                            </div>
+
+                            <div class="col_amount">
+                                <div class="label">
+                                    {{ $t('message.multisend_confirm_amount_label') }}
+                                </div>
+                            </div>
+
+                            <div class="coin" v-for="coin in item.coins" :key="coinIndex">
+                                <div class="col_denom">
+                                    <div class="val">{{ formatTokenName(coin.denom) }}</div>
+                                </div>
+
+                                <div class="col_amount">
+                                    <div class="val">{{ coin.amount }}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
 
                 <button class="confirm_btn" @click.prevent="send()">
                     {{ $t('message.btn_confirm') }}
@@ -200,149 +223,132 @@
 
 
 <style scoped>
-    .titles
+    .sender
     {
-        font-size: 14px;
-        line-height: 17px;
+        font-size: 16px;
 
-        display: flex;
-        align-content: center;
-        align-items: center;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
+        padding: 10px 20px;
 
-        margin-top: 68px;
-
-        color: #8e8e8e;
-        border: 1px solid #fff;
+        border: 2px solid #c986ff;
+        border-radius: 30px;
+        background: #131313;
     }
 
-    .titles ~ .titles
+
+
+    .list
     {
         margin-top: 20px;
     }
 
 
-    .titles > *
-    {
-        width: 100%;
-        padding: 9px;
-    }
-
-    .titles > *.col_denom,
-    .titles > *.col_amount
-    {
-        width: 120px;
-        min-width: 120px;
-    }
-
-    .titles > * + *
-    {
-        border-left: 1px solid #fff;
-    }
-
-
-
-    .sender
-    {
-        font-size: 14px;
-        line-height: 17px;
-
-        display: flex;
-        align-content: center;
-        align-items: center;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-
-        margin-top: -1px;
-        padding: 9px;
-
-        border: 1px solid #fff;
-    }
-
-
-
     .recipient
     {
-        font-size: 14px;
-        line-height: 17px;
+        font-size: 24px;
+        font-weight: 600;
+        line-height: calc(100% + 4px);
 
         display: flex;
-        align-content: center;
-        align-items: center;
+        align-content: flex-start;
+        align-items: flex-start;
         flex-wrap: wrap;
-        justify-content: flex-start;
+        justify-content: space-between;
 
-        margin-top: -1px;
+        padding: 10px 20px;
 
-        border: 1px solid #fff;
+        border-radius: 20px;
+        background: linear-gradient(180deg, #cca3ff 0%, #9d4cff 100%);
+    }
+
+
+    .recipient + .recipient
+    {
+        margin-top: 20px;
+    }
+
+
+    .recipient .label
+    {
+        font-size: 18px;
+        font-weight: 500;
+
+        color: #6114bf;
     }
 
 
     .recipient .col_address
     {
-        width: calc(100% - 240px);
-        padding: 9px;
+        width: 363px;
+        max-width: 100%;
+    }
+
+
+    .recipient .col_denom
+    {
+        width: 130px;
+        max-width: 100%;
+    }
+
+
+    .recipient .col_amount
+    {
+        width: calc(100% - 150px);
     }
 
 
     .recipient .coins
     {
         display: flex;
-        align-content: stretch;
-        align-items: stretch;
-        flex-wrap: nowrap;
+        align-content: flex-start;
+        align-items: flex-start;
+        flex-wrap: wrap;
         justify-content: flex-start;
 
-        width: 240px;
-        min-width: 240px;
+        width: 400px;
+        max-width: 100%;
         margin-left: auto;
     }
 
-    .recipient .coins + .coins
-    {
-        border-top: 1px solid #fff;
-    }
 
-
-    .recipient .coins > *
+    .recipient .coins .coin
     {
+        display: flex;
+        align-content: flex-start;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+
         width: 100%;
-        padding: 9px;
-
-        border-left: 1px solid #fff;
-    }
-
-
-    .recipient .coins .col_denom
-    {
-        text-transform: uppercase;
     }
 
 
 
     .confirm_btn
     {
-        font-weight: 500;
-        line-height: 19px;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 110%;
 
         display: block;
 
-        width: 100%;
-        height: 55px;
-        margin-top: 40px;
-        padding: 10px;
+        width: 170px;
+        max-width: 100%;
+        height: 52px;
+        margin-top: 20px;
+        margin-left: auto;
 
-        transition: background .2s linear;
+        transition: .2s linear;
 
-        color: #fff;
+        border: 2px solid #762cb9;
         border-radius: 14px;
-        background: #950fff;
+        background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
     }
 
 
     .confirm_btn:hover
     {
-        background: #7700e1;
+        color: #8425da;
+        background: #fff;
     }
+
 </style>
