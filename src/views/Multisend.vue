@@ -625,6 +625,8 @@
     {
         position: relative;
 
+        width: 780px;
+        max-width: 100%;
         padding: 40px;
 
         background: none;
@@ -730,6 +732,7 @@
     .item
     {
         position: relative;
+
         padding: 20px 30px;
     }
 

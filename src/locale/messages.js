@@ -11,7 +11,7 @@ export default {
 
 
             // Actions
-            'actions_title': 'Apps',
+            'actions_title': 'Services',
 
 
             // Multisend form
@@ -38,7 +38,7 @@ export default {
 
 
             // Footer
-            'footer_title': 'Have questions? Feel free to contact with us.',
+            'footer_title': 'Have questions? Feel free to contact us.',
             'footer_copyright': 'Bro & Bro team, 2024',
 
 
