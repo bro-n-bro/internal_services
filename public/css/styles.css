@@ -105,8 +105,8 @@ input[type=number]
     --bg: #000;
     --scroll_width: 17px;
     --text_color: #fff;
-    --font_size: 16px;
-    --font_size_title: 30px;
+    --font_size: 14px;
+    --font_size_title: 24px;
     --font_family: 'Poppins', 'Arial', sans-serif;
 }
 
@@ -914,7 +914,10 @@ button
     width: 100%;
     height: 100%;
 
-    background: rgba(0, 0, 0, .8);
+    background: rgba(0, 0, 0, .30);
+
+            backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
 }
 
 
@@ -932,17 +935,16 @@ button
 
     width: 100%;
     height: 100%;
-    padding: 134px 40px 40px;
+    padding: 40px;
 }
 
 
 .modal_content .modal_title
 {
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 600;
-    line-height: 130%;
 
-    margin-bottom: 12px;
+    margin-bottom: 13px;
 }
 
 
@@ -950,48 +952,13 @@ button
 {
     position: relative;
 
-    width: 680px;
+    width: 920px;
     max-width: 100%;
     margin: auto;
-    padding: 20px;
+    padding: 10px 30px 30px;
 
     cursor: default;
 
-    border-radius: 36px;
-    background: #141414;
-}
-
-
-.modal_content .data > .close_btn
-{
-    position: absolute;
-    z-index: 3;
-    top: 24px;
-    right: 20px;
-
-    display: flex;
-    align-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    width: 36px;
-    height: 36px;
-
-    transition: color .2s linear;
-}
-
-
-.modal_content .data > .close_btn svg
-{
-    display: block;
-
-    width: 36px;
-    height: 36px;
-}
-
-
-.modal_content .data > .close_btn:hover
-{
-    color: #950fff;
+    border-radius: 30px;
+    background: radial-gradient(105.5% 98.03% at 5.54% 89.26%, rgba(71, 26, 146, .70) 0%, rgba(0, 0, 0, .00) 100%), radial-gradient(93.58% 174.85% at 97.08% 5.37%, rgba(71, 26, 146, .70) 0%, rgba(0, 0, 0, .00) 100%), linear-gradient(132deg, #8f00b0 -12.79%, #570099 45.8%, #1b0044 99.42%);
 }

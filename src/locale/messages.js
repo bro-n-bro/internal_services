@@ -23,7 +23,6 @@ export default {
 
 
             // IBS
-            'ibs_page_title': 'Inter Blockchain Services',
             'ibs_modal_title': 'Logs :',
             'ibs_modal_processing': 'Processing...',
 

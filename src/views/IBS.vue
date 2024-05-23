@@ -3,37 +3,44 @@
 
     <template v-else>
     <div class="page_head">
-        <div class="page_title">
-            {{ $t('message.ibs_page_title') }}
-        </div>
-
         <!-- Choose network -->
         <ChooseNetwork :commands />
     </div>
 
 
-    <div class="row">
-        <div class="section" v-for="(relayer, relayerIndex) in relayers" :key="relayerIndex">
-            <div class="title">
-                <span>{{ relayer.fromName }}</span>
+    <div class="data">
+        <div class="row">
+            <div class="section" v-for="(relayer, relayerIndex) in relayers" :key="relayerIndex">
+                <div class="title">
+                    <span>{{ relayer.fromName }}</span>
 
-                <span class="sep"><=></span>
+                    <img src="@/assets/ibs_title_sep.svg" alt="" class="sep">
 
-                <span>{{ relayer.toName }}</span>
+                    <span>{{ relayer.toName }}</span>
+                </div>
+
+                <div class="commands">
+                    <label v-for="(command, commandIndex) in relayer.commands" :key="commandIndex" @click.prevent="setCommand(relayerIndex, command.command)">
+                        <input type="radio" v-model="relayer.currentCommand" :value="command.command" :name="`relayer${relayerIndex}`">
+
+                        <div v-if="command.name === 'clear'">
+                            <svg class="icon"><use xlink:href="@/assets/sprite.svg#ic_trash"></use></svg>
+
+                            <span>{{ $t('message.btn_clear') }}</span>
+                        </div>
+
+                        <div v-if="command.name === 'update'">
+                            <svg class="icon"><use xlink:href="@/assets/sprite.svg#ic_update"></use></svg>
+
+                            <span>{{ $t('message.btn_update') }}</span>
+                        </div>
+                    </label>
+                </div>
+
+                <button class="execute_btn" :disabled="!relayer.currentCommand.length"@click.prevent="executeCommand(relayerIndex)">
+                    {{ $t('message.btn_execute') }}
+                </button>
             </div>
-
-            <div class="commands">
-                <label v-for="(command, commandIndex) in relayer.commands" :key="commandIndex" @click.prevent="setCommand(relayerIndex, command.command)">
-                    <input type="radio" v-model="relayer.currentCommand" :value="command.command" :name="`relayer${relayerIndex}`">
-
-                    <div v-if="command.name === 'clear'">{{ $t('message.btn_clear') }}</div>
-                    <div v-if="command.name === 'update'">{{ $t('message.btn_update') }}</div>
-                </label>
-            </div>
-
-            <button class="execute_btn" :disabled="!relayer.currentCommand.length"@click.prevent="executeCommand(relayerIndex)">
-                {{ $t('message.btn_execute') }}
-            </button>
         </div>
     </div>
     </template>
@@ -171,54 +178,77 @@
 
 
 <style scoped>
+    .data
+    {
+        width: 920px;
+        max-width: 100%;
+    }
+
+
     .row
     {
         align-content: stretch;
         align-items: stretch;
 
-        margin-bottom: -24px;
-        margin-left: -24px;
+        margin-bottom: -20px;
+        margin-left: -40px;
     }
 
 
     .row > *
     {
-        width: calc(50% - 24px);
-        margin-bottom: 24px;
-        margin-left: 24px;
+        width: calc(50% - 40px);
+        margin-bottom: 20px;
+        margin-left: 40px;
     }
 
 
     .section
     {
-        padding: 23px;
+        padding: 29px;
 
-        border: 1px solid #950fff;
-        border-radius: 14px;
+        border: 1px solid #915cd4;
+        border-radius: 30px;
+        background: radial-gradient(82.21% 105.43% at 50% 13.3%, rgba(71, 26, 146, .70) 0%, rgba(35, 6, 83, .70) 63.74%, rgba(0, 0, 0, .70) 100%), linear-gradient(132deg, rgba(143, 0, 176, .70) -12.79%, rgba(87, 0, 153, .70) 45.8%, rgba(27, 0, 68, .70) 99.42%);
     }
 
 
     .section .title
     {
-        font-size: 20px;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 100%;
 
         display: flex;
         align-content: center;
         align-items: center;
         flex-wrap: wrap;
-        justify-content: center;
+        justify-content: space-between;
 
         margin-bottom: 20px;
+        padding: 10px 12px;
 
         text-align: center;
+
+        border-radius: 10px;
+        background: #763dba;
     }
 
 
     .section .title span
     {
         display: block;
+        overflow: hidden;
 
+        width: calc(50% - 25px);
+        padding: 10px;
+
+        white-space: nowrap;
         text-transform: lowercase;
+        text-overflow: ellipsis;
+
+        border-radius: 6px;
+        background: #191919;
     }
 
     .section .title span::first-letter
@@ -229,7 +259,10 @@
 
     .section .title .sep
     {
-        margin: 0 12px;
+        display: block;
+
+        width: 31px;
+        height: 22px;
     }
 
 
@@ -241,8 +274,8 @@
         flex-wrap: wrap;
         justify-content: space-between;
 
-        margin-bottom: -10px;
-        margin-left: -10px;
+        margin-bottom: -20px;
+        margin-left: -20px;
     }
 
 
@@ -256,13 +289,15 @@
     {
         display: block;
 
-        width: calc(50% - 10px);
-        margin-bottom: 10px;
-        margin-left: 10px;
+        width: calc(50% - 20px);
+        margin-bottom: 20px;
+        margin-left: 20px;
+        padding: 2px;
 
         cursor: pointer;
 
         border-radius: 10px;
+        background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
     }
 
 
@@ -274,48 +309,66 @@
 
     .commands label div
     {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 100%;
+
         display: flex;
         align-content: center;
         align-items: center;
         flex-wrap: wrap;
         justify-content: center;
 
-        min-height: 48px;
-        padding: 9px;
+        height: 48px;
 
         transition: .2s linear;
         text-align: center;
 
-        border: 1px solid transparent;
-        border-radius: 10px;
-        background: #191919;
+        border-radius: 8px;
+    }
+
+
+    .commands label div .icon
+    {
+        display: block;
+
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
     }
 
 
     .commands input:checked + div
     {
-        border-color: #950fff;
+        color: #762cb9;
+        background: #fff;
     }
 
 
     .execute_btn
     {
-        font-weight: 500;
-        line-height: 19px;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 100%;
 
         display: block;
 
         width: 100%;
-        height: 48px;
+        height: 50px;
         margin-top: 20px;
-        padding: 10px;
-
-        transition: .2s linear;
 
         color: #fff;
-        border-radius: 14px;
-        background: #950fff;
+        border: 1px solid #d57cff;
+        border-radius: 38px;
     }
+
+
+    .execute_btn:hover
+    {
+        border: none;
+        background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
+    }
+
 
     .execute_btn:disabled
     {
@@ -325,9 +378,4 @@
         opacity: .5;
     }
 
-
-    .execute_btn:hover
-    {
-        background: #7700e1;
-    }
 </style>

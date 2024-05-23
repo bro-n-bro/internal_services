@@ -43,7 +43,7 @@
         width: 1440px;
         max-width: 100%;
         margin: 0 auto;
-        padding: 24px 0 30px;
+        padding: 24px 0;
 
         border: 1px solid #7544ff;
         border-bottom: none;
@@ -84,6 +84,7 @@
 
         color: currentColor;
         border-radius: 50%;
+        transition: opacity .2s linear;
     }
 
     .socials a + a
@@ -92,12 +93,17 @@
     }
 
 
+    .socials a:hover{
+        opacity: 0.7;
+    }
+
+
     .socials svg
     {
         display: block;
 
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
 
         border-radius: 50%;
 
@@ -111,7 +117,7 @@
         width: 1308px;
         max-width: 100%;
         height: 1px;
-        margin-top: 30px;
+        margin-top: 16px;
 
         background: linear-gradient(90deg, rgba(255, 255, 255, .00) 0%, rgba(255, 255, 255, .20) 50.04%, rgba(255, 255, 255, .00) 100%);
     }
@@ -124,7 +130,7 @@
         line-height: 130%;
 
         width: 100%;
-        margin-top: 20px;
+        margin-top: 16px;
 
         text-align: center;
         letter-spacing: -.64px;

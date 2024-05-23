@@ -2,27 +2,11 @@
     <section class="modal" id="manage_modal">
         <div class="modal_content">
             <div class="data">
-                <div class="title">
+                <div class="modal_title">
                     {{ $t('message.ibs_modal_title') }}
                 </div>
 
-                <div class="list" v-if="wsMessages.length">
-                    <div v-for="(message, index) in wsMessages" :key="index">
-                        <!-- <pre v-if="nessage.type === 'code'">
-                            {{ message.text }}
-                        </pre>
-
-                        <template v-else>
-                            {{ message.text }}
-                        </template> -->
-
-                        {{ message.text }}
-
-                        <!-- <pre>
-                            {{ message.text }}
-                        </pre> -->
-                    </div>
-                </div>
+                <pre class="list" v-if="wsMessages.length"><div v-for="(message, index) in wsMessages" :key="index">{{ message }}</div></pre>
 
                 <div class="processing" v-if="processing">
                     {{ $t('message.ibs_modal_processing') }}
@@ -56,27 +40,10 @@
 
         // Get messages
         store.socket.onmessage = e => {
-            // if (e.data.startsWith('SUCCESS [')) {
-            //     wsMessages.value.push({
-            //         text: e.data,
-            //         type: 'code'
-            //     })
-            // } else {
-            //     wsMessages.value.push({
-            //         text: e.data,
-            //         type: 'text'
-            //     })
-            // }
-
-            console.log(e.data + e.data.length)
-
-            wsMessages.value.push({
-                text: e.data,
-                type: 'text'
-            })
+            wsMessages.value.push(JSON.parse(e.data))
 
             // Finished status
-            if (e.data === 'FINISHED') {
+            if (JSON.parse(e.data) === 'FINISHED') {
                 processing.value = false
             }
         }
@@ -92,102 +59,70 @@
     }
 
 
-    .title
-    {
-        font-size: 30px;
-        font-weight: 600;
-        line-height: calc(100% + 6px);
-
-        margin-bottom: 28px;
-
-        text-align: center;
-    }
-
-
-
-    .list
-    {
-        font-size: 15px;
-
-        text-align: center;
-    }
-
-
-    .list > * + *
-    {
-        margin-top: 20px;
-    }
-
 
     pre
     {
+        padding: 9px 19px;
+
         white-space: pre-wrap;
+
+        color: #fff;
+        border: 2px solid #c986ff;
+        border-radius: 20px;
+        background: #131313;
+    }
+
+    pre > * + *
+    {
+        margin-top: 8px;
     }
 
 
 
     .processing
     {
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 600;
-        line-height: calc(100% + 6px);
+        line-height: 48px;
 
-        margin-top: 28px;
+        width: 170px;
+        max-width: 100%;
+        height: 52px;
+        margin-top: 20px;
+        margin-left: auto;
 
-        animation: pulse 3s infinite;
         text-align: center;
 
-        color: #950fff;
-    }
-
-
-    @keyframes pulse
-    {
-        0%
-        {
-            transform: scale(1);
-
-            opacity: 1;
-        }
-
-        50%
-        {
-            transform: scale(.8);
-
-            opacity: .5;
-        }
-
-        100%
-        {
-            transform: scale(1);
-
-            opacity: 1;
-        }
+        color: rgba(255, 255, 255, .2);
+        border: 2px solid #762cb9;
+        border-radius: 14px;
+        background: linear-gradient(329deg, rgba(118, 44, 185, .40) -28.05%, rgba(132, 37, 218, .40) 32.19%, rgba(185, 107, 255, .40) 90.69%);
     }
 
 
     .btn
     {
-        font-weight: 500;
-        line-height: 19px;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 48px;
 
         display: block;
 
         width: 100%;
-        height: 48px;
-        margin-top: 28px;
-        padding: 10px;
-
-        transition: .2s linear;
+        height: 52px;
+        margin-top: 20px;
 
         color: #fff;
+        border: 2px solid #762cb9;
         border-radius: 14px;
-        background: #950fff;
+        background: linear-gradient(329deg, rgba(118, 44, 185, .40) -28.05%, rgba(132, 37, 218, .40) 32.19%, rgba(185, 107, 255, .40) 90.69%);
     }
 
 
     .btn:hover
     {
-        background: #7700e1;
+        border: none;
+        background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
     }
+
 </style>
