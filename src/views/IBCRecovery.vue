@@ -1,20 +1,13 @@
 <template>
     <Loader v-if="loading" />
 
-    <template v-else>
-    <div class="page_head">
-        <!-- Choose network -->
-        <ChooseNetwork :commands />
-    </div>
-
-
-    <div class="data">
+    <div class="data" v-else>
         <div class="row">
             <div class="section" v-for="(relayer, relayerIndex) in relayers" :key="relayerIndex">
                 <div class="title">
                     <span>{{ relayer.fromName }}</span>
 
-                    <img src="@/assets/ibs_title_sep.svg" alt="" class="sep">
+                    <img src="@/assets/ibc_recovery_title_sep.svg" alt="" class="sep">
 
                     <span>{{ relayer.toName }}</span>
                 </div>
@@ -43,7 +36,6 @@
             </div>
         </div>
     </div>
-    </template>
 
 
     <!-- Answers modal -->
@@ -54,25 +46,25 @@
 <script setup>
     import { ref, onBeforeMount, inject } from 'vue'
     import { useGlobalStore } from '@/stores'
+    import { useRoute } from 'vue-router'
     import { chains } from 'chain-registry'
 
     // Components
     import Loader from '@/components/Loader.vue'
-    import ChooseNetwork  from '@/components/ibs/ChooseNetwork.vue'
-    import AnswersModal  from '@/components/ibs/AnswersModal.vue'
+    import AnswersModal  from '@/components/ibc_recovery/AnswersModal.vue'
 
 
     const store = useGlobalStore(),
         emitter = inject('emitter'),
+        route = useRoute(),
         loading = ref(true),
-        commands = ref([]),
         showAnswersModal = ref(false),
         relayers = ref([])
 
 
-    onBeforeMount(async () => {
-        // Get IBS commands
-        commands.value = await store.GetIBSCommands()
+    onBeforeMount(() => {
+        // Set current service
+        store.currentService = route.name
 
         // Init WebSockets
         store.initWebSockets()
@@ -85,7 +77,7 @@
     // Get chain data
     function getChainData(chainId) {
         // Get chain commands
-        let chainCommands = commands.value.filter(command => command.includes(chainId))
+        let chainCommands = store.commands.filter(command => command.includes(chainId))
 
         chainCommands.forEach(command => {
             // Split
@@ -100,16 +92,13 @@
 
                 // From chain info
                 arr[0] === 'space-pussy'
-                    ? fromChainInfo = store.networks.ibs.space_pussy
+                    ? fromChainInfo = store.networks.ibc_recovery.space_pussy
                     : fromChainInfo = chains.find(chain => chain.chain_id === arr[0])
 
                 // To chain info
                 arr[1] === 'space-pussy'
-                    ? toChainInfo = store.networks.ibs.space_pussy
+                    ? toChainInfo = store.networks.ibc_recovery.space_pussy
                     : toChainInfo = chains.find(chain => chain.chain_id === arr[1])
-
-                    console.log(fromChainInfo)
-                    console.log(toChainInfo)
 
                 // Set data
                 relayers.value.push({
@@ -130,9 +119,6 @@
                     command: command
                 })
             }
-
-
-            console.log(relayers.value)
         })
     }
 
@@ -169,8 +155,8 @@
     })
 
 
-    // Event "closeIBSAnswersModal"
-    emitter.on('closeIBSAnswersModal', () => {
+    // Event "closeIBCRecoveryAnswersModal"
+    emitter.on('closeIBCRecoveryAnswersModal', () => {
         // Hide modal
         showAnswersModal.value = false
     })
@@ -292,7 +278,6 @@
         width: calc(50% - 20px);
         margin-bottom: 20px;
         margin-left: 20px;
-        padding: 2px;
 
         cursor: pointer;
 
@@ -319,12 +304,12 @@
         flex-wrap: wrap;
         justify-content: center;
 
-        height: 48px;
+        height: 52px;
 
         transition: .2s linear;
         text-align: center;
 
-        border-radius: 8px;
+        border-radius: 10px;
     }
 
 
@@ -365,7 +350,7 @@
 
     .execute_btn:hover
     {
-        border: none;
+        border-color: transparent;
         background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
     }
 

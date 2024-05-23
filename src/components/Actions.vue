@@ -7,7 +7,7 @@
         <div class="line"></div>
 
         <div class="list">
-            <router-link to="/multisend/cosmoshub" class="item">
+            <router-link to="/multisend/cosmoshub" class="item" :class="{ active: store.currentService === 'Multisend' }">
                 <div class="icon">
                     <img src="@/assets/ic_multisend.svg" alt="" loading="lazy">
                 </div>
@@ -17,17 +17,17 @@
                 <svg class="check"><use xlink:href="@/assets/sprite.svg#ic_check"></use></svg>
             </router-link>
 
-            <router-link to="/ibs" class="item">
+            <router-link to="/ibc_recovery" class="item" :class="{ active: store.currentService === 'IBCRecovery' }">
                 <div class="icon">
-                    <img src="@/assets/ic_ibs.svg" alt="" loading="lazy">
+                    <img src="@/assets/ic_ibc_recovery.svg" alt="" loading="lazy">
                 </div>
 
-                <span>IBS</span>
+                <span>IBC recovery</span>
 
                 <svg class="check"><use xlink:href="@/assets/sprite.svg#ic_check"></use></svg>
             </router-link>
 
-            <router-link to="/ibc_route/cosmoshub" class="item">
+            <router-link to="/ibc_route/cosmoshub" class="item" :class="{ active: store.currentService === 'IBCRoute' }">
                 <div class="icon">
                     <img src="@/assets/ic_ibc_route.svg" alt="" loading="lazy">
                 </div>
@@ -42,7 +42,10 @@
 
 
 <script setup>
+    import { useGlobalStore } from '@/stores'
 
+
+    const store = useGlobalStore()
 </script>
 
 
@@ -184,13 +187,13 @@
 
 
 .actions .item:hover,
-.actions .item.router-link-active
+.actions .item.active
 {
     background: #141414;
 }
 
 
-.actions .item.router-link-active .check
+.actions .item.active .check
 {
     opacity: 1;
 }

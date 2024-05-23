@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useLocalStorage } from '@vueuse/core'
 import { createKeplrOfflineSinger, denomTraces } from '@/utils'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { assets } from 'chain-registry'
@@ -15,9 +16,9 @@ import stargaze from '@/stores/networks/stargaze'
 import stride from '@/stores/networks/stride'
 import desmos from '@/stores/networks/desmos'
 import agoric from '@/stores/networks/agoric'
-// import bandchain from '@/stores/networks/bandchain'
+import bandchain from '@/stores/networks/bandchain'
 import celestia from '@/stores/networks/celestia'
-// import composable from '@/stores/networks/composable'
+import composable from '@/stores/networks/composable'
 import dymension from '@/stores/networks/dymension'
 import empowerchain from '@/stores/networks/empowerchain'
 import neutron from '@/stores/networks/neutron'
@@ -39,9 +40,9 @@ const allNetworks = {
     stride,
     desmos,
     agoric,
-    // bandchain,
+    bandchain,
     celestia,
-    // composable,
+    composable,
     dymension,
     empowerchain,
     neutron,
@@ -54,7 +55,7 @@ const allNetworks = {
 
 export const useGlobalStore = defineStore('global', {
     state: () => ({
-        currentNetwork: 'cosmoshub',
+        currentService: '',
 
         Keplr: {},
         stargateClient: {},
@@ -70,12 +71,22 @@ export const useGlobalStore = defineStore('global', {
 
             IBC: allNetworks,
 
-            ibs: {
+            ibc_recovery: {
                 space_pussy
             }
         },
 
         socket: {},
+        commands: {},
+
+        multisendCurrentNetwork: '',
+        multisendFavorites: useLocalStorage('multisendFavorites', {}),
+
+        IBCRecoveryCurrentNetwork: '',
+        IBCRecoveryFavorites: useLocalStorage('IBCRecoveryFavorites', {}),
+
+        IBCRouteCurrentNetwork: '',
+        IBCRouteFavorites: useLocalStorage('IBCRouteFavorites', {}),
 
         formatableTokens: [
             {
@@ -110,8 +121,8 @@ export const useGlobalStore = defineStore('global', {
         },
 
 
-        // Get IBS commands
-        async GetIBSCommands() {
+        // Get IBC Recovery commands
+        async GetIBCRecoveryCommands() {
             let result = []
 
             try {
@@ -127,25 +138,25 @@ export const useGlobalStore = defineStore('global', {
 
 
         // Init APP
-        async initApp() {
+        async initApp(currentNetwork) {
             if (window.keplr) {
                 // Keplr connect
-                await createKeplrOfflineSinger(this.networks.global[this.currentNetwork].chainId)
+                await createKeplrOfflineSinger(this.networks.global[currentNetwork].chainId)
 
                 // Stargate client
-                this.stargateClient = await SigningStargateClient.connectWithSigner(this.networks.global[this.currentNetwork].rpc_api, this.Keplr.offlineSinger)
+                this.stargateClient = await SigningStargateClient.connectWithSigner(this.networks.global[currentNetwork].rpc_api, this.Keplr.offlineSinger)
 
                 // Get currencies price
                 await this.getCurrenciesPrice()
 
                 // Get balances
-                await this.getBalances()
+                await this.getBalances(currentNetwork)
             }
         },
 
 
         // Get balances
-        async getBalances() {
+        async getBalances(currentNetwork) {
             // Request
             this.balances = await this.stargateClient.getAllBalances(this.Keplr.account.address)
 
@@ -161,7 +172,7 @@ export const useGlobalStore = defineStore('global', {
             // Get balance info
             for (const balance of this.balances) {
                 // Denom traces
-                balance.denom_traces = await denomTraces(balance.denom)
+                balance.denom_traces = await denomTraces(balance.denom, currentNetwork)
 
                 if (!balance.denom_traces.ingnoreTraces) {
                     assets.forEach(chain => {
@@ -186,7 +197,7 @@ export const useGlobalStore = defineStore('global', {
                     // Get denom info by chain-registry assets
                     try {
                         // Get chain info
-                        let chainInfo = assets.find(({chain_name}) => chain_name === this.networks.multisend[this.currentNetwork].alias)
+                        let chainInfo = assets.find(({chain_name}) => chain_name === this.networks.global[currentNetwork].alias)
 
                         // Get denom info
                         let denomInfo = chainInfo.assets.find(({base}) => base === balance.denom)

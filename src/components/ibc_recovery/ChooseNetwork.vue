@@ -1,13 +1,12 @@
 <template>
-    <div class="choose_network" ref="target">
+    <div class="choose_network" ref="target" v-if="!loading">
         <button class="btn" @click.prevent="showDropdown = !showDropdown" :class="{ active: showDropdown }">
             <div class="logo">
-                <img :src="getNetworkLogo(store.networks.multisend[store.multisendCurrentNetwork].chainId)" alt="">
+                <img :src="getNetworkLogo(currentNetwork.chain_id)" alt="">
             </div>
 
             <div>
-                <div class="name">{{ store.networks.multisend[store.multisendCurrentNetwork].name }}</div>
-                <div class="token">{{ store.networks.multisend[store.multisendCurrentNetwork].token_name }}</div>
+                <div class="name">{{ currentNetwork.pretty_name }}</div>
             </div>
 
             <svg class="arr"><use xlink:href="@/assets/sprite.svg#ic_arr_ver2"></use></svg>
@@ -16,29 +15,24 @@
 
         <div class="mini_modal" v-show="showDropdown">
             <div class="scroll">
-                <div v-for="(network, index) in store.networks.multisend" :key="index"
-                    :class="{ favorited: store.multisendFavorites[network.chainId] }"
+                <div v-for="(network, index) in networks" :key="index"
+                    :class="{ favorited: store.IBCRecoveryFavorites[network.chain_id] }"
                 >
-                    <router-link class="network"
-                        :class="{ active: store.multisendCurrentNetwork == network.alias }"
-                        :to="`/multisend/${network.alias}`"
-                        @click="showDropdown = !showDropdown"
-                    >
+                    <button class="network" :class="{ active: currentNetwork.chain_id == network.chain_id }" @click.prevent="setCurrentNetwork(index)">
                         <div class="logo">
-                            <img :src="getNetworkLogo(network.chainId)" alt="" loading="lazy">
+                            <img :src="getNetworkLogo(network.chain_id)" alt="" loading="lazy">
                         </div>
 
                         <div>
-                            <div class="name">{{ network.name }}</div>
-                            <div class="token">{{ network.token_name }}</div>
+                            <div class="name">{{ network.pretty_name }}</div>
                         </div>
 
-                        <button class="favorite_btn" :class="{ active: store.multisendFavorites[network.chainId] }" @click.stop.prevent="toggleFavorite(network.chainId)">
+                        <button class="favorite_btn" :class="{ active: store.IBCRecoveryFavorites[network.chain_id] }" @click.stop.prevent="toggleFavorite(network.chain_id)">
                             <svg><use xlink:href="@/assets/sprite.svg#ic_favorite"></use></svg>
 
                             <svg><use xlink:href="@/assets/sprite.svg#ic_favorite"></use></svg>
                         </button>
-                    </router-link>
+                    </button>
                 </div>
             </div>
         </div>
@@ -47,20 +41,69 @@
 
 
 <script setup>
-    import { ref } from 'vue'
+    import { ref, onBeforeMount, inject } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { onClickOutside } from '@vueuse/core'
     import { getNetworkLogo } from '@/utils'
+    import { chains } from 'chain-registry'
 
 
     const store = useGlobalStore(),
+        emitter = inject('emitter'),
+        networks = ref([]),
+        currentNetwork = ref({}),
+        loading = ref(true),
         showDropdown = ref(false),
         target = ref(null)
 
 
+    onBeforeMount(async () => {
+        // Get IBS commands
+        store.commands = await store.GetIBCRecoveryCommands()
+
+        // Parse commands
+        store.commands.forEach(command => {
+            let arr = command.split('/'),
+                chainIDs = [arr[0], arr[1]],
+                networkConfig = null
+
+            chainIDs.forEach(chainId => {
+                // Get network config
+                chainId === 'space-pussy'
+                    ? networkConfig = store.networks.ibc_recovery.space_pussy
+                    : networkConfig = chains.find(chain => chain.chain_id === chainId)
+
+                // Set data
+                if (!networks.value.find(el => el.chain_id === networkConfig.chain_id)) {
+                    networks.value.push(networkConfig)
+                }
+            })
+        })
+
+        // Set current network
+        setCurrentNetwork(0)
+
+        // Hide loader
+        loading.value = false
+    })
+
+
+    // Set current network
+    function setCurrentNetwork(index) {
+        // Set data
+        currentNetwork.value = networks.value[index]
+
+        // Hide dropdown
+        showDropdown.value = false
+
+        // Send "updateCurrentNetwork" event
+        emitter.emit('updateCurrentNetwork', { chainId: networks.value[index].chain_id })
+    }
+
+
     // Toggle favorite
     function toggleFavorite(chainId) {
-        store.multisendFavorites[chainId] = !store.multisendFavorites[chainId]
+        store.IBCRecoveryFavorites[chainId] = !store.IBCRecoveryFavorites[chainId]
     }
 
 

@@ -3,14 +3,31 @@
         <div class="cont row">
             <!-- Logo -->
             <Logo />
+
+            <!-- Multisend choose network -->
+            <MultisendChooseNetwork v-if="store.currentService === 'Multisend'" />
+
+            <!-- IBC Recovery choose network -->
+            <IBCRecoveryChooseNetwork v-if="store.currentService === 'IBCRecovery'" />
+
+            <!-- IBC Route choose network -->
+            <IBCRouteChooseNetwork v-if="store.currentService === 'IBCRoute'" />
         </div>
     </header>
 </template>
 
 
 <script setup>
+    import { useGlobalStore } from '@/stores'
+
     // Components
     import Logo from '@/components/header/Logo.vue'
+    import MultisendChooseNetwork  from '@/components/multisend/ChooseNetwork.vue'
+    import IBCRecoveryChooseNetwork  from '@/components/ibc_recovery/ChooseNetwork.vue'
+    import IBCRouteChooseNetwork  from '@/components/ibc_route/ChooseNetwork.vue'
+
+
+    const store = useGlobalStore()
 </script>
 
 
@@ -31,6 +48,11 @@
 
     header .cont
     {
+        align-content: center;
+        align-items: center;
+        justify-content: space-between;
+
         padding: 0 20px;
     }
+
 </style>

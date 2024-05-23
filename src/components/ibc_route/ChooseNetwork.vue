@@ -1,23 +1,26 @@
 <template>
     <div class="choose_network" ref="target">
-        <button class="btn" @click.prevent="showDropdown = !showDropdown">
+        <button class="btn" @click.prevent="showDropdown = !showDropdown" :class="{ active: showDropdown }">
             <div class="logo">
-                <img :src="getNetworkLogo(store.networks.IBC[store.currentNetwork].chainId)" alt="">
+                <img :src="getNetworkLogo(store.networks.IBC[store.IBCRouteCurrentNetwork].chainId)" alt="">
             </div>
 
             <div>
-                <div class="name">{{ store.networks.IBC[store.currentNetwork].name }}</div>
-                <div class="token">{{ store.networks.IBC[store.currentNetwork].token_name }}</div>
+                <div class="name">{{ store.networks.IBC[store.IBCRouteCurrentNetwork].name }}</div>
+                <div class="token">{{ store.networks.IBC[store.IBCRouteCurrentNetwork].token_name }}</div>
             </div>
 
-            <svg class="arr"><use xlink:href="@/assets/sprite.svg#ic_arr_ver"></use></svg>
+            <svg class="arr"><use xlink:href="@/assets/sprite.svg#ic_arr_ver2"></use></svg>
         </button>
 
 
         <div class="mini_modal" v-show="showDropdown">
             <div class="scroll">
-                <div v-for="(network, index) in store.networks.IBC" :key="index">
-                    <router-link class="network" :class="{ active: store.currentNetwork == network.alias }"
+                <div v-for="(network, index) in store.networks.IBC" :key="index"
+                    :class="{ favorited: store.IBCRouteFavorites[network.chainId] }"
+                >
+                    <router-link class="network"
+                        :class="{ active: store.IBCRouteCurrentNetwork == network.alias }"
                         :to="`/ibc_route/${network.alias}`"
                         @click="showDropdown = !showDropdown"
                     >
@@ -30,7 +33,11 @@
                             <div class="token">{{ network.token_name }}</div>
                         </div>
 
-                        <svg class="icon"><use xlink:href="@/assets/sprite.svg#ic_check"></use></svg>
+                        <button class="favorite_btn" :class="{ active: store.IBCRouteFavorites[network.chainId] }" @click.stop.prevent="toggleFavorite(network.chainId)">
+                            <svg><use xlink:href="@/assets/sprite.svg#ic_favorite"></use></svg>
+
+                            <svg><use xlink:href="@/assets/sprite.svg#ic_favorite"></use></svg>
+                        </button>
                     </router-link>
                 </div>
             </div>
@@ -51,6 +58,12 @@
         target = ref(null)
 
 
+    // Toggle favorite
+    function toggleFavorite(chainId) {
+        store.IBCRouteFavorites[chainId] = !store.IBCRouteFavorites[chainId]
+    }
+
+
     // Click outside
     onClickOutside(target, e => showDropdown.value = false)
 </script>
@@ -62,13 +75,16 @@
         position: relative;
         z-index: 9;
 
-        width: 264px;
+        width: 300px;
         max-width: 100%;
     }
 
 
     .choose_network .btn
     {
+        position: relative;
+        z-index: 3;
+
         display: flex;
         align-content: center;
         align-items: center;
@@ -76,76 +92,73 @@
         justify-content: space-between;
 
         width: 100%;
-        height: 60px;
-        padding: 9px;
+        height: 50px;
+        padding: 4px 20px 4px 4px;
 
-        transition: background .2s linear;
         text-align: left;
 
-        border: 1px solid transparent;
-        border-radius: 14px;
-        background: #141414;
+        border-radius: 42px;
+        background: linear-gradient(129deg, #a42dff 27.86%, #410094 92.64%);
     }
 
 
     .choose_network .btn .logo
     {
-        position: relative;
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
 
-        overflow: hidden;
-
-        width: 40px;
-        height: 40px;
-        margin-right: 14px;
+        width: 42px;
+        height: 42px;
+        margin-right: 10px;
+        padding: 4px;
 
         border-radius: 50%;
+        background: #2e3148;
     }
 
     .choose_network .btn .logo img
     {
-        position: absolute;
-        top: 0;
-        left: 0;
-
         display: block;
 
-        width: 100%;
-        height: 100%;
-
-        border-radius: 50%;
-
-        object-fit: cover;
+        max-width: 100%;
+        max-height: 100%;
     }
 
     .choose_network .btn .logo + *
     {
-        width: calc(100% - 92px);
+        width: calc(100% - 96px);
     }
 
 
     .choose_network .btn .name
     {
         font-size: 18px;
-        font-weight: 500;
-        line-height: 100%;
+        font-weight: 600;
+        line-height: 120%;
 
         overflow: hidden;
 
         white-space: nowrap;
+        text-transform: lowercase;
         text-overflow: ellipsis;
+    }
+
+    .choose_network .btn .name::first-letter
+    {
+        text-transform: uppercase;
     }
 
 
     .choose_network .btn .token
     {
         font-size: 12px;
-        line-height: 15px;
+        font-weight: 500;
+        line-height: 120%;
 
-        margin-top: 6px;
-
-        text-transform: uppercase;
-
-        color: #555;
+        opacity: .6;
     }
 
 
@@ -154,22 +167,16 @@
         display: block;
 
         width: 24px;
-        height: 24px;
-        margin-left: 14px;
+        height: 20px;
+        margin-left: auto;
 
         transition: transform .2s linear;
     }
 
 
-    .choose_network .btn:hover
-    {
-        background: #353535;
-    }
-
     .choose_network .btn.active
     {
-        border-color: #950fff;
-        background: #141414;
+        background: none;
     }
 
     .choose_network .btn.active .arr
@@ -182,37 +189,53 @@
     .choose_network .mini_modal
     {
         position: absolute;
-        top: 100%;
+        z-index: 1;
+        top: 0;
         left: 0;
 
         width: 100%;
-        margin-top: 4px;
-        padding: 4px;
+        padding: 62px 10px 10px;
 
-        border-radius: 10px;
-        background: #101010;
+        border-radius: 26px;
+        background: linear-gradient(129deg, #a42dff 27.86%, #410094 92.64%);
     }
 
 
     .choose_network .mini_modal .scroll
     {
+        display: flex;
         overflow: auto;
+        flex-direction: column;
 
-        max-height: 257px;
-        padding-right: 4px;
+        max-height: 345px;
+        padding: 10px;
+
+        border-radius: 20px;
+        background: #141414;
 
         overscroll-behavior-y: contain;
     }
 
     .choose_network .mini_modal .scroll::-webkit-scrollbar
     {
-        width: 5px;
-        height: 5px;
+        width: 4px;
+        height: 4px;
+    }
+
+
+    .choose_network .mini_modal .scroll > *
+    {
+        order: 3;
+    }
+
+    .choose_network .mini_modal .scroll > *.favorited
+    {
+        order: 1;
     }
 
     .choose_network .mini_modal .scroll > * + *
     {
-        margin-top: 8px;
+        margin-top: 5px;
     }
 
 
@@ -222,10 +245,10 @@
         align-content: center;
         align-items: center;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: flex-start;
 
         width: 100%;
-        padding: 4px 10px 4px 4px;
+        padding: 4px 8px 4px 4px;
 
         transition: background .2s linear;
         text-align: left;
@@ -238,120 +261,122 @@
 
     .choose_network .network .logo
     {
-        position: relative;
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
 
-        overflow: hidden;
-
-        width: 30px;
-        height: 30px;
-        margin-right: 6px;
+        width: 42px;
+        height: 42px;
+        margin-right: 10px;
+        padding: 4px;
 
         border-radius: 50%;
-    }
-
-    .choose_network .network .logo + *
-    {
-        width: calc(100% - 66px);
+        background: #2e3148;
     }
 
 
     .choose_network .network .logo img
     {
-        position: absolute;
-        top: 0;
-        left: 0;
-
         display: block;
 
-        width: 100%;
-        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+    }
 
-        border-radius: 50%;
 
-        object-fit: cover;
+    .choose_network .network .logo + *
+    {
+        width: calc(100% - 98px);
     }
 
 
     .choose_network .network .name
     {
-        line-height: 100%;
+        font-weight: 600;
+        line-height: 120%;
+
+        text-transform: lowercase;
+    }
+
+    .choose_network .network .name::first-letter
+    {
+        text-transform: uppercase;
     }
 
 
     .choose_network .network .token
     {
-        font-size: 12px;
-        line-height: 15px;
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 120%;
 
-        margin-top: 6px;
+        margin-top: 2px;
 
-        text-transform: uppercase;
-
-        color: #555;
+        opacity: .6;
     }
 
 
-    .choose_network .network .icon
+    .choose_network .network .favorite_btn
+    {
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        width: 42px;
+        height: 42px;
+        margin-left: auto;
+
+        transition: .2s linear;
+
+        opacity: .3;
+    }
+
+
+    .choose_network .network .favorite_btn svg
     {
         display: block;
 
-        width: 24px;
-        height: 24px;
-        margin-left: 6px;
+        width: 100%;
+        height: 100%;
+    }
 
-        transition: opacity .2s linear;
 
-        opacity: 0;
+    .choose_network .network .favorite_btn svg + svg
+    {
+        display: none;
+    }
+
+
+    .choose_network .network .favorite_btn:hover
+    {
+        opacity: 1;
+    }
+
+    .choose_network .network .favorite_btn.active
+    {
+        opacity: 1;
+        color: #ffba35;
+    }
+
+    .choose_network .network .favorite_btn.active svg
+    {
+        display: none;
+    }
+
+    .choose_network .network .favorite_btn.active svg + svg
+    {
+        display: block;
     }
 
 
     .choose_network .network:hover,
     .choose_network .network.active
     {
-        background: #191919;
-    }
-
-    .choose_network .network.active .icon
-    {
-        opacity: 1;
-    }
-
-
-    header .choose_network .mini_modal .scroll
-    {
-        max-height: calc(100vh - 134px);
-    }
-
-
-
-    @media print, (max-width: 767px)
-    {
-        .choose_network
-        {
-            width: 224px;
-        }
-
-
-        .choose_network .btn .name
-        {
-            font-size: 16px;
-        }
-    }
-
-
-
-    @media print, (max-width: 479px)
-    {
-        .choose_network
-        {
-            margin-top: 20px;
-        }
-
-
-        header .choose_network
-        {
-            width: 100%;
-        }
+        background: #262626;
     }
 
 </style>
