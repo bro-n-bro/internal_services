@@ -14,7 +14,7 @@
 
                 <div class="commands">
                     <label v-for="(command, commandIndex) in relayer.commands" :key="commandIndex" @click.prevent="setCommand(relayerIndex, command.command)">
-                        <input type="radio" v-model="relayer.currentCommand" :value="command.command" :name="`relayer${relayerIndex}`">
+                        <input type="radio" v-model="currentCommand" :value="command.command">
 
                         <div v-if="command.name === 'clear'">
                             <svg class="icon"><use xlink:href="@/assets/sprite.svg#ic_trash"></use></svg>
@@ -30,7 +30,7 @@
                     </label>
                 </div>
 
-                <button class="execute_btn" :disabled="!relayer.currentCommand.length"@click.prevent="executeCommand(relayerIndex)">
+                <button class="execute_btn" :disabled="!relayer.status" @click.prevent="executeCommand()">
                     {{ $t('message.btn_execute') }}
                 </button>
             </div>
@@ -59,7 +59,8 @@
         route = useRoute(),
         loading = ref(true),
         showAnswersModal = ref(false),
-        relayers = ref([])
+        relayers = ref([]),
+        currentCommand = ref(null)
 
 
     onBeforeMount(() => {
@@ -107,7 +108,7 @@
                     to: toChainInfo.bech32_prefix,
                     fromName: fromChainInfo.pretty_name,
                     toName: toChainInfo.pretty_name,
-                    currentCommand: '',
+                    status: false,
                     commands: [{
                         name: arr[2],
                         command: command
@@ -125,17 +126,23 @@
 
     // Set command
     function setCommand(relayerIndex, command) {
-        relayers.value[relayerIndex].currentCommand = command
+        // Set command
+        currentCommand.value = command
+
+        // Update active relayer
+        relayers.value.forEach(relayer => relayer.status = false)
+
+        relayers.value[relayerIndex].status = true
     }
 
 
     // Execute command
-    function executeCommand(relayerIndex) {
+    function executeCommand() {
         // Show modal
         showAnswersModal.value = true
 
         // Send command
-        store.socket.send(relayers.value[relayerIndex].currentCommand)
+        store.socket.send(currentCommand.value)
     }
 
 
@@ -164,6 +171,16 @@
 
 
 <style scoped>
+    .loader_wrap
+    {
+        position: relative;
+
+        padding: 40px;
+
+        background: none;
+    }
+
+
     .data
     {
         width: 920px;
