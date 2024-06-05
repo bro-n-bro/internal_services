@@ -37,6 +37,11 @@ export default {
             'ibc_empty_title': 'No tokens available',
 
 
+            // Search
+            'search_placeholder': 'Search',
+            'search_empty': 'Network not found',
+
+
             // Footer
             'footer_title': 'Have questions? Feel free to contact us.',
             'footer_copyright': 'Bro & Bro team, 2024',

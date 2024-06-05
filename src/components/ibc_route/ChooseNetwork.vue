@@ -15,8 +15,11 @@
 
 
         <div class="mini_modal" v-show="showDropdown">
-            <div class="scroll">
-                <div v-for="(network, index) in store.networks.IBC" :key="index"
+            <!-- Search -->
+            <Search />
+
+            <div class="scroll" v-if="Object.keys(searchResult).length">
+                <div v-for="(network, index) in searchResult" :key="index"
                     :class="{ favorited: store.IBCRouteFavorites[network.chainId] }"
                 >
                     <router-link class="network"
@@ -41,21 +44,36 @@
                     </router-link>
                 </div>
             </div>
+
+            <div class="empty" v-else>
+                {{ $t('message.search_empty') }}
+            </div>
         </div>
     </div>
 </template>
 
 
 <script setup>
-    import { ref } from 'vue'
+    import { ref, onBeforeMount, inject } from 'vue'
     import { useGlobalStore } from '@/stores'
     import { onClickOutside } from '@vueuse/core'
     import { getNetworkLogo } from '@/utils'
 
+    // Components
+    import Search from '@/components/Search.vue'
+
 
     const store = useGlobalStore(),
+        emitter = inject('emitter'),
         showDropdown = ref(false),
-        target = ref(null)
+        target = ref(null),
+        searchResult = ref(null)
+
+
+    onBeforeMount(() => {
+        // Default search result
+        searchResult.value = store.networks.IBC
+    })
 
 
     // Toggle favorite
@@ -66,6 +84,20 @@
 
     // Click outside
     onClickOutside(target, e => showDropdown.value = false)
+
+
+    // Event "search"
+    emitter.on('search', ({ query }) => {
+        // Clear search result
+        searchResult.value = []
+
+        // Set new result
+        for (let key in store.networks.IBC) {
+            if (store.networks.IBC[key].name.toLocaleLowerCase().includes(query.toLocaleLowerCase())) {
+                searchResult.value.push(store.networks.IBC[key])
+            }
+        }
+    })
 </script>
 
 
@@ -198,6 +230,21 @@
 
         border-radius: 26px;
         background: linear-gradient(129deg, #a42dff 27.86%, #410094 92.64%);
+    }
+
+
+    .choose_network .empty
+    {
+        font-size: 16px;
+        font-weight: 500;
+        font-style: normal;
+        line-height: 120%;
+
+        padding: 24px 20px;
+
+        color: rgba(255,255,255,.4);
+        border-radius: 20px;
+        background: #141414;
     }
 
 
