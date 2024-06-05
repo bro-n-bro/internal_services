@@ -69,9 +69,6 @@
 
         // Init WebSockets
         store.initWebSockets()
-
-        // Hide loader
-        loading.value = false
     })
 
 
@@ -175,6 +172,8 @@
     {
         position: relative;
 
+        width: 920px;
+        max-width: 100%;
         padding: 40px;
 
         background: none;
