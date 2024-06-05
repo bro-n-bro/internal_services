@@ -9,7 +9,7 @@
                 <pre class="list" v-if="wsMessages.length"><div v-for="(message, index) in wsMessages" :key="index">{{ message }}</div></pre>
 
                 <div class="processing" v-if="processing">
-                    {{ $t('message.ibc_recovery_modal_processing') }}
+                    {{ $t('message.ibc_recovery_modal_processing') }}<span></span>
                 </div>
 
                 <button class="btn" v-else @click.self="emitter.emit('closeIBCRecoveryAnswersModal')">
@@ -98,6 +98,49 @@
         border: 2px solid #762cb9;
         border-radius: 14px;
         background: linear-gradient(329deg, rgba(118, 44, 185, .40) -28.05%, rgba(132, 37, 218, .40) 32.19%, rgba(185, 107, 255, .40) 90.69%);
+    }
+
+
+    @keyframes dots
+    {
+        0%
+        {
+            content: '';
+        }
+        25%
+        {
+            content: '.';
+        }
+        50%
+        {
+            content: '..';
+        }
+        75%
+        {
+            content: '...';
+        }
+        100%
+        {
+            content: '';
+        }
+    }
+
+
+    .processing span
+    {
+        display: inline-block;
+
+        width: 16px;
+
+        text-align: left;
+        vertical-align: top;
+    }
+
+
+    .processing span:after
+    {
+        content: '';
+        animation: dots 1.5s steps(4, end) infinite;
     }
 
 

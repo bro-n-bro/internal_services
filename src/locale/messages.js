@@ -29,7 +29,7 @@ export default {
 
             // IBC Recovery
             'ibc_recovery_modal_title': 'Logs :',
-            'ibc_recovery_modal_processing': 'Processing...',
+            'ibc_recovery_modal_processing': 'Processing',
 
 
             // IBC route
