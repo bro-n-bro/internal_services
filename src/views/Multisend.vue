@@ -3,10 +3,14 @@
 
     <form v-else action="" class="form" :class="{ processing: processing }" @submit.prevent="onSubmit()">
         <div class="head">
-            <label class="import_btn">
+            <button type="button" class="import_btn" @click.prevent="showUploadModal = !showUploadModal">
+                {{ $t('message.btn_import_csv') }}
+            </button>
+
+            <!-- <label class="import_btn">
                 <input type="file" name="import_file" accept=".csv" @change="importCSV($event)">
                 <div>{{ $t('message.btn_import_csv') }}</div>
-            </label>
+            </label> -->
         </div>
 
         <div class="item" v-for="(item, itemIndex) in data" :key="itemIndex">
@@ -121,6 +125,9 @@
 
     <!-- Confirm modal-->
     <ConfirmModal :data v-if="showConfirmModal" />
+
+    <!-- Upload modal-->
+    <UploadModal :data v-if="showUploadModal" />
 </template>
 
 
@@ -135,6 +142,7 @@
     // Components
     import Loader from '@/components/Loader.vue'
     import ConfirmModal  from '@/components/modal/MultisendConfirm.vue'
+    import UploadModal  from '@/components/modal/MultisendUpload.vue'
 
 
     const store = useGlobalStore(),
@@ -145,6 +153,7 @@
         loading = ref(true),
         processing = ref(false),
         showConfirmModal = ref(false),
+        showUploadModal = ref(false),
         data = ref([
             {
                 address: '',
@@ -617,6 +626,13 @@
         // Set processing
         processing.value = status
     })
+
+
+    // Event "closeMultisendUploadModal"
+    emitter.on('closeMultisendUploadModal', () => {
+        // Show confirm modal
+        showUploadModal.value = false
+    })
 </script>
 
 
@@ -713,19 +729,11 @@
 
         margin-left: auto;
 
-        cursor: pointer;
-
         background: linear-gradient(135deg,  #d57cff 0%,#520c97 100%);
         -webkit-background-clip: text;
                 background-clip: text;
 
         -webkit-text-fill-color: transparent;
-    }
-
-
-    .import_btn input
-    {
-        display: none;
     }
 
 
@@ -923,7 +931,6 @@
     .clear_btn:hover
     {
         color: #8425da;
-        border: none;
         background: #fff;
     }
 

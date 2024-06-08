@@ -42,6 +42,12 @@ export default {
             'search_empty': 'Network not found',
 
 
+            // Upload modal
+            'upload_modal_title': 'Upload Your CSV',
+            'upload_drag_label': 'Drag your file here',
+            'upluad_example_link': 'Take example',
+
+
             // Footer
             'footer_title': 'Have questions? Feel free to contact us.',
             'footer_copyright': 'Bro & Bro team, 2024',
@@ -58,6 +64,8 @@ export default {
             'btn_close': 'Close',
             'btn_import_csv': 'Import CSV',
             'btn_clear_all': 'Clear all',
+            'btn_upload': 'Upload',
+            'btn_attach': 'Attach',
 
 
             // Notofications
