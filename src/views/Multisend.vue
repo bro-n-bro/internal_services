@@ -478,10 +478,10 @@
     }
 
 
-    // import CSV
-    async function importCSV(event) {
+    // Import CSV
+    function importCSV(fileContent) {
         // Parse file
-        await Papa.parse(event.target.files[0], {
+        Papa.parse(fileContent, {
             header: true,
             skipEmptyLines: true,
             complete: result => {
@@ -518,6 +518,9 @@
 
                 // Update placeholders
                 updatePlaceholders()
+
+                // Hide upload modal
+                showUploadModal.value = false
             }
         })
     }
@@ -531,7 +534,7 @@
                 importData[i] = null
             } else {
                 // Address prefix
-                let isStartsWith = item.Address.startsWith(store.networks.multisend[store.currentNetwork].prefix)
+                let isStartsWith = item.Address.startsWith(store.networks.multisend[store.multisendCurrentNetwork].prefix)
 
                 if (!isStartsWith) {
                     importData[i] = null
@@ -573,7 +576,7 @@
                 text: i18n.global.t('message.notification_importCSV_desc'),
                 type: 'error',
                 data: {
-                    chain: store.networks.multisend[store.currentNetwork].name
+                    chain: store.networks.multisend[store.multisendCurrentNetwork].name
                 }
             })
         }
@@ -603,6 +606,13 @@
 
         return Object.values(result)
     }
+
+
+    // Event "importFile"
+    emitter.on('importFile', fileContent => {
+        // Import CSV
+        importCSV(fileContent)
+    })
 
 
     // Event "updateBalances"
