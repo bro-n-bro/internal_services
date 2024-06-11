@@ -34,7 +34,14 @@ export default {
 
             // IBC route
             'ibc_route_page_title': 'IBC route',
-            'ibc_empty_title': 'No tokens available',
+            'ibc_route_empty_title': 'No tokens available',
+            'ibc_route_return_path_label': 'Return path: {count} chains',
+            'ibc_route_return_path_no_need': "Return path: {count} chains",
+            'ibc_route_return_path_chain_name_label': 'Chain name:',
+            'ibc_route_return_path_status_verified': 'Verified',
+            'ibc_route_return_path_status_broken': 'Broken',
+            'ibc_route_return_path_status_expired': 'Expired',
+            'ibc_route_path_label': 'Path:',
 
 
             // Search

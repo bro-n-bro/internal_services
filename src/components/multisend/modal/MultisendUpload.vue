@@ -28,7 +28,7 @@
                     </a>
                 </div>
 
-                <button class="upload_btn" @click.prevent="uploadFile">
+                <button class="upload_btn" @click.prevent="uploadFile" :disabled="!file">
                     {{ $t('message.btn_upload') }}
                 </button>
             </div>
@@ -44,7 +44,7 @@
 
 
     const emitter = inject('emitter'),
-        file = ref({})
+        file = ref(null)
 
 
     // Handle drag over
@@ -97,125 +97,131 @@
 
 
 <style scoped>
-.data
-{
-    width: 650px;
-    padding-right: 20px;
-    padding-bottom: 26px;
-    padding-left: 20px;
-}
+    .data
+    {
+        width: 650px;
+        padding-right: 20px;
+        padding-bottom: 26px;
+        padding-left: 20px;
+    }
 
 
-.modal_title
-{
-    margin-bottom: 13px;
-    padding: 0 20px;
-}
+    .modal_title
+    {
+        margin-bottom: 13px;
+        padding: 0 20px;
+    }
 
 
-.drag_drop
-{
-    font-size: 24px;
-    font-weight: 600;
+    .drag_drop
+    {
+        font-size: 24px;
+        font-weight: 600;
 
-    display: flex;
-    align-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: space-between;
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: space-between;
 
-    padding: 4px 4px 4px 19px;
+        padding: 4px 4px 4px 19px;
 
-    cursor: move;
-    cursor: grab;
+        cursor: move;
+        cursor: grab;
 
-    color: #8425da;
-    border: 1px dashed #8425da;
-    border-radius: 30px;
-    background: #390469;
-}
-
-
-.drag_drop .btn
-{
-    font-size: 24px;
-    font-weight: 600;
-
-    display: flex;
-    align-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    padding: 6px 14px;
-
-    cursor: pointer;
-
-    color: #fff;
-    border-radius: 31px;
-    background: #8425da;
-}
+        color: #8425da;
+        border: 1px dashed #8425da;
+        border-radius: 30px;
+        background: #390469;
+    }
 
 
-.drag_drop .btn input
-{
-    display: none;
-}
+    .drag_drop .btn
+    {
+        font-size: 24px;
+        font-weight: 600;
+
+        display: flex;
+        align-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        padding: 6px 14px;
+
+        cursor: pointer;
+
+        color: #fff;
+        border-radius: 31px;
+        background: #8425da;
+    }
 
 
-.drag_drop .btn .icon
-{
-    display: block;
-
-    width: 21px;
-    height: 21px;
-    margin-right: 10px;
-}
+    .drag_drop .btn input
+    {
+        display: none;
+    }
 
 
-.sample
-{
-    font-size: 20px;
-    font-weight: 300;
+    .drag_drop .btn .icon
+    {
+        display: block;
 
-    margin-top: 4px;
-    padding: 0 24px;
-}
-
-
-.sample a
-{
-    text-decoration: none;
-
-    color: currentColor;
-}
+        width: 21px;
+        height: 21px;
+        margin-right: 10px;
+    }
 
 
-.upload_btn
-{
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 110%;
+    .sample
+    {
+        font-size: 20px;
+        font-weight: 300;
 
-    display: block;
-
-    width: 170px;
-    height: 52px;
-    margin-top: 20px;
-    margin-left: auto;
-    padding: 8px 10px;
-
-    border: 2px solid #762cb9;
-    border-radius: 14px;
-    background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
-}
+        margin-top: 4px;
+        padding: 0 24px;
+    }
 
 
-.upload_btn:hover
-{
-    color: #8425da;
-    background: #fff;
-}
+    .sample a
+    {
+        text-decoration: none;
+
+        color: currentColor;
+    }
 
 
+    .upload_btn
+    {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 110%;
+
+        display: block;
+
+        width: 170px;
+        height: 52px;
+        margin-top: 20px;
+        margin-left: auto;
+        padding: 8px 10px;
+
+        border: 2px solid #762cb9;
+        border-radius: 14px;
+        background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
+    }
+
+
+    .upload_btn:hover
+    {
+        color: #8425da;
+        background: #fff;
+    }
+
+
+    .upload_btn:disabled
+    {
+        pointer-events: none;
+
+        opacity: .5;
+    }
 </style>

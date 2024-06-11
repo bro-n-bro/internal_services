@@ -51,7 +51,7 @@
 
     // Components
     import Loader from '@/components/Loader.vue'
-    import AnswersModal  from '@/components/ibc_recovery/AnswersModal.vue'
+    import AnswersModal  from '@/components/ibc_recovery/modal/AnswersModal.vue'
 
 
     const store = useGlobalStore(),

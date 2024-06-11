@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
 import { createKeplrOfflineSinger, denomTraces } from '@/utils'
 import { SigningStargateClient } from '@cosmjs/stargate'
-import { assets } from 'chain-registry'
+import { assets, chains } from 'chain-registry'
 import { getPriceByDenom, formatTokenAmount } from '@/utils'
 
 // Networks
@@ -180,7 +180,11 @@ export const useGlobalStore = defineStore('global', {
                         let denomInfo = chain.assets.find(token => token.base === balance.denom_traces.base_denom)
 
                         if (denomInfo) {
+                            // Get chain info
+                            // let chainInfo = chains.find(chain => chain.pretty_name === denomInfo.name)
+
                             // Set info
+                            // balance.chain_id = chainInfo ? chainInfo.chain_id : null
                             balance.base_denom = denomInfo.base
                             balance.symbol = denomInfo.symbol
 

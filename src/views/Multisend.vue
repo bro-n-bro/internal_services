@@ -141,8 +141,8 @@
 
     // Components
     import Loader from '@/components/Loader.vue'
-    import ConfirmModal  from '@/components/modal/MultisendConfirm.vue'
-    import UploadModal  from '@/components/modal/MultisendUpload.vue'
+    import ConfirmModal  from '@/components/multisend/modal/MultisendConfirm.vue'
+    import UploadModal  from '@/components/multisend/modal/MultisendUpload.vue'
 
 
     const store = useGlobalStore(),

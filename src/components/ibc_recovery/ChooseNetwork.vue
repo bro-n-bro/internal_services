@@ -33,7 +33,7 @@
                         <button class="favorite_btn" :class="{ active: store.IBCRecoveryFavorites[network.chain_id] }" @click.stop.prevent="toggleFavorite(network.chain_id)">
                             <svg><use xlink:href="@/assets/sprite.svg#ic_favorite"></use></svg>
 
-                            <svg><use xlink:href="@/assets/sprite.svg#ic_favorite"></use></svg>
+                            <svg><use xlink:href="@/assets/sprite.svg#ic_favorite_a"></use></svg>
                         </button>
                     </button>
                 </div>
