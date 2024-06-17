@@ -416,6 +416,7 @@ button
 .form .field .max_btn
 {
     font-size: 16px;
+    line-height: 100%;
 
     position: absolute;
     z-index: 3;
@@ -425,11 +426,14 @@ button
 
     display: block;
 
-    margin: auto;
+    height: 40px;
+    margin: auto 0;
     padding: 10px 12px;
 
-    transition: .2s linear;
+    transition: background .2s linear;
     text-transform: uppercase;
+
+    border-radius: 14px;
 }
 
 
@@ -438,6 +442,12 @@ button
     pointer-events: none;
 
     opacity: .75;
+}
+
+
+.form .field .max_btn:hover
+{
+    background: #141414;
 }
 
 
@@ -588,7 +598,7 @@ button
     width: 170px;
     max-width: 100%;
     height: 52px;
-    padding: 9px;
+    padding: 8px 10px;
 
     color: #fff;
     border: 2px solid #762cb9;
@@ -606,8 +616,13 @@ button
 
 .form .submit_btn:hover
 {
+    background: linear-gradient(329deg, #b96bff -28.05%, #8425da 30.46%, #762cb9 90.69%);
+}
+
+
+.form .submit_btn:active
+{
     color: #8425da;
-    border: none;
     background: #fff;
 }
 
