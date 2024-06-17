@@ -88,8 +88,15 @@ export default {
             'notification_multisend_success_title': 'Multisend successful',
             'notification_multisend_action': 'Multisend',
 
-            'notification_importCSV_title': 'Some error',
-            'notification_importCSV_desc': 'The imported file contains errors.',
+            'notification_importCSV_error_title': 'Error',
+
+            'notification_importCSV_error_missing_address': 'The Address field value is missing.',
+            'notification_importCSV_error_invalid_address': 'Invalid address.',
+
+            'notification_importCSV_error_missing_denom': 'The Denom field value is missing.',
+            'notification_importCSV_error_invalid_denom': 'Invalid denom.',
+
+            'notification_importCSV_error_invalid_amount': 'Invalid amount value.',
 
             'notification_tx_error_2': "tx parse error",
             'notification_tx_error_3': "invalid sequence",

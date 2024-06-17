@@ -181,10 +181,10 @@ export const useGlobalStore = defineStore('global', {
 
                         if (denomInfo) {
                             // Get chain info
-                            // let chainInfo = chains.find(chain => chain.pretty_name === denomInfo.name)
+                            let chainInfo = chains.find(chain => chain.pretty_name.charAt(0).toUpperCase() + chain.pretty_name.slice(1) === denomInfo.name)
 
                             // Set info
-                            // balance.chain_id = chainInfo ? chainInfo.chain_id : null
+                            balance.chain_id = chainInfo != undefined ? chainInfo.chain_id : null
                             balance.base_denom = denomInfo.base
                             balance.symbol = denomInfo.symbol
 

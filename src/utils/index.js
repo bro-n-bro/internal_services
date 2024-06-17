@@ -132,7 +132,7 @@ export const getNetworkLogo = chainId => {
     let store = useGlobalStore(),
         logos = null
 
-    if (chainId !== undefined) {
+    if (chainId) {
         if (chainId === 'space-pussy') {
             logos = store.networks.ibc_recovery.space_pussy.images
         } else {

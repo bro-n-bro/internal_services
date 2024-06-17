@@ -17,25 +17,27 @@
             <!-- Search -->
             <Search />
 
-            <div class="scroll" v-if="searchResult.length">
-                <div v-for="(network, index) in searchResult" :key="index"
-                    :class="{ favorited: store.IBCRecoveryFavorites[network.chain_id] }"
-                >
-                    <button class="network" :class="{ active: currentNetwork.chain_id == network.chain_id }" @click.prevent="setCurrentNetwork(index)">
-                        <div class="logo">
-                            <img :src="getNetworkLogo(network.chain_id)" alt="" loading="lazy">
-                        </div>
+            <div class="scroll_wrap" v-if="Object.keys(searchResult).length">
+                <div class="scroll">
+                    <div v-for="(network, index) in searchResult" :key="index"
+                        :class="{ favorited: store.IBCRecoveryFavorites[network.chain_id] }"
+                    >
+                        <button class="network" :class="{ active: currentNetwork.chain_id == network.chain_id }" @click.prevent="setCurrentNetwork(index)">
+                            <div class="logo">
+                                <img :src="getNetworkLogo(network.chain_id)" alt="" loading="lazy">
+                            </div>
 
-                        <div>
-                            <div class="name">{{ network.pretty_name }}</div>
-                        </div>
+                            <div>
+                                <div class="name">{{ network.pretty_name }}</div>
+                            </div>
 
-                        <button class="favorite_btn" :class="{ active: store.IBCRecoveryFavorites[network.chain_id] }" @click.stop.prevent="toggleFavorite(network.chain_id)">
-                            <svg><use xlink:href="@/assets/sprite.svg#ic_favorite"></use></svg>
+                            <button class="favorite_btn" :class="{ active: store.IBCRecoveryFavorites[network.chain_id] }" @click.stop.prevent="toggleFavorite(network.chain_id)">
+                                <svg><use xlink:href="@/assets/sprite.svg#ic_favorite"></use></svg>
 
-                            <svg><use xlink:href="@/assets/sprite.svg#ic_favorite_a"></use></svg>
+                                <svg><use xlink:href="@/assets/sprite.svg#ic_favorite_a"></use></svg>
+                            </button>
                         </button>
-                    </button>
+                    </div>
                 </div>
             </div>
 
@@ -140,7 +142,7 @@
 </script>
 
 
-<style>
+<style scoped>
     .choose_network
     {
         position: relative;
@@ -272,90 +274,6 @@
     }
 
 
-    .choose_network .search
-    {
-        position: relative;
-
-        margin-bottom: 10px;
-    }
-
-
-    .choose_network .search ::-webkit-input-placeholder
-    {
-        color: rgba(255, 255, 255, .40);
-    }
-
-    .choose_network .search :-moz-placeholder
-    {
-        color: rgba(255, 255, 255, .40);
-    }
-
-    .choose_network .search ::-moz-placeholder
-    {
-        opacity: 1;
-        color: rgba(255, 255, 255, .40);
-    }
-
-    .choose_network .search :-ms-input-placeholder
-    {
-        color: rgba(255, 255, 255, .40);
-    }
-
-
-    .choose_network .search .input
-    {
-        font-family: var(--font_family);
-        font-size: 16px;
-        font-size: var(--font_size);
-        font-weight: 600;
-
-        display: block;
-
-        width: 100%;
-        height: 29px;
-        padding: 0 39px 0 14px;
-
-        transition: .2s linear;
-
-        color: var(--text_color);
-        border: 1px solid #7544ff;
-        border-radius: 20px;
-        background: rgba(215, 171, 255, .40);
-    }
-
-
-    .choose_network .search .icon
-    {
-        position: absolute;
-        z-index: 3;
-        top: 0;
-        right: 10px;
-        bottom: 0;
-
-        display: block;
-
-        width: 18px;
-        height: 19px;
-        margin: auto 0;
-
-        transition: opacity .2s linear;
-        pointer-events: none;
-
-        opacity: .4;
-    }
-
-
-    .choose_network .search .input:focus
-    {
-        background: rgba(0, 0, 0, .40);
-    }
-
-    .choose_network .search .input:focus .icon
-    {
-        opacity: 1;
-    }
-
-
     .choose_network .empty
     {
         font-size: 16px;
@@ -371,6 +289,17 @@
     }
 
 
+    .choose_network .scroll_wrap
+    {
+        overflow: hidden;
+
+        padding-right: 4px;
+
+        border-radius: 20px;
+        background: #141414;
+    }
+
+
     .choose_network .scroll
     {
         display: flex;
@@ -378,10 +307,7 @@
         flex-direction: column;
 
         max-height: 345px;
-        padding: 5px 10px 10px;
-
-        border-radius: 20px;
-        background: #141414;
+        padding: 10px 6px 10px 10px;
 
         overscroll-behavior-y: contain;
     }
@@ -396,12 +322,16 @@
     .choose_network .scroll > *
     {
         order: 3;
-        margin-top: 5px;
     }
 
     .choose_network .scroll > *.favorited
     {
         order: 1;
+    }
+
+    .choose_network .scroll > * + *
+    {
+        margin-top: 5px;
     }
 
 

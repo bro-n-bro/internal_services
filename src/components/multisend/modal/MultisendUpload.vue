@@ -10,11 +10,12 @@
                     {{ $t('message.upload_modal_title') }}
                 </div>
 
-                <div class="drag_drop" @dragover.prevent="handleDragOver" @dragleave="handleDragLeave" @drop.prevent="handleFileDrop">
-                    <div>{{ $t('message.upload_drag_label') }}</div>
+                <div class="drag_drop" @dragover.prevent="handleDragOver" @dragleave="handleDragLeave" @drop.prevent="handleFileDrop" @click.self="triggerFileInput">
+                    <div v-if="fileName.length">{{ fileName }}</div>
+                    <div v-else>{{ $t('message.upload_drag_label') }}</div>
 
                     <label class="btn">
-                        <input type="file" name="import_file" accept=".csv" @change="handleFileChange">
+                        <input type="file" name="import_file" accept=".csv" @change="handleFileChange" ref="fileInput">
 
                         <svg class="icon"><use xlink:href="@/assets/sprite.svg#ic_file"></use></svg>
 
@@ -44,7 +45,15 @@
 
 
     const emitter = inject('emitter'),
-        file = ref(null)
+        fileInput = ref(null),
+        file = ref(null),
+        fileName = ref('')
+
+
+    // Trigger file input
+    function triggerFileInput() {
+        fileInput.value.click()
+    }
 
 
     // Handle drag over
@@ -64,6 +73,7 @@
         if (event.target.files.length) {
             // Set file
             file.value = event.target.files[0]
+            fileName.value = event.target.files[0].name
         }
     }
 
@@ -73,6 +83,7 @@
         if (event.dataTransfer.files.length) {
             // Set file
             file.value = event.dataTransfer.files[0]
+            fileName.value = event.dataTransfer.files[0].name
         }
     }
 
@@ -81,7 +92,7 @@
     function uploadFile() {
         if (file.value) {
             // File reader
-            const reader = new FileReader()
+            let reader = new FileReader()
 
             // Send file content
             reader.onload = e => emitter.emit('importFile', e.target.result)
@@ -150,6 +161,7 @@
         padding: 6px 14px;
 
         cursor: pointer;
+        transition: .2s linear;
 
         color: #fff;
         border-radius: 31px;
@@ -173,6 +185,14 @@
     }
 
 
+    .drag_drop .btn:hover,
+    .drag_drop .btn:active
+    {
+        color: #8425da;
+        background: #fff;
+    }
+
+
     .sample
     {
         font-size: 20px;
@@ -185,9 +205,36 @@
 
     .sample a
     {
+        position: relative;
+
+        display: inline-block;
+
+        vertical-align: top;
         text-decoration: none;
 
         color: currentColor;
+    }
+
+
+    .sample a:after
+    {
+        position: absolute;
+        bottom: 4px;
+        left: 0;
+
+        width: 0;
+        height: 1px;
+
+        content: '';
+        transition: width .3s linear;
+
+        background: linear-gradient(135deg,  currentColor 0%,currentColor 100%);
+    }
+
+
+    .sample a:hover:after
+    {
+        width: 100%;
     }
 
 
@@ -211,7 +258,8 @@
     }
 
 
-    .upload_btn:hover
+    .upload_btn:hover,
+    .upload_btn:active
     {
         color: #8425da;
         background: #fff;

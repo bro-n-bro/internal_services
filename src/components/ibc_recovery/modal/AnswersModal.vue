@@ -165,8 +165,13 @@
 
     .btn:hover
     {
-        border: none;
-        background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
+        background: linear-gradient(329deg, #b96bff -28.05%, #8425da 30.46%, #762cb9 90.69%);
     }
 
+
+    .btn:active
+    {
+        color: #8425da;
+        background: #fff;
+    }
 </style>

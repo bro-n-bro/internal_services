@@ -322,7 +322,6 @@
 
         height: 52px;
 
-        transition: .2s linear;
         text-align: center;
 
         border-radius: 10px;
@@ -341,7 +340,8 @@
 
     .commands input:checked + div
     {
-        color: #762cb9;
+        color: #8425da;
+        border: 2px solid #762cb9;
         background: #fff;
     }
 
@@ -366,8 +366,15 @@
 
     .execute_btn:hover
     {
-        border-color: transparent;
+        border: 1px solid #d57cff;
         background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
+    }
+
+
+    .execute_btn:active
+    {
+        border: none;
+        background: linear-gradient(329deg, #b96bff -28.05%, #8425da 30.46%, #762cb9 90.69%);
     }
 
 
@@ -378,5 +385,4 @@
 
         opacity: .5;
     }
-
 </style>

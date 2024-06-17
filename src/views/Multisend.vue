@@ -16,6 +16,7 @@
         <div class="item" v-for="(item, itemIndex) in data" :key="itemIndex">
             <button type="button" class="delete_btn" v-if="itemIndex" @click="deleteItem(itemIndex)">
                 <img src="@/assets/ic_remove.svg" alt="">
+                <img src="@/assets/ic_remove_a.svg" alt="">
             </button>
 
             <div class="line">
@@ -93,10 +94,12 @@
 
                 <button type="button" class="add_btn" v-if="!coinIndex" @click="addCoinToItem(itemIndex)">
                     <img src="@/assets/ic_plus.svg" alt="">
+                    <img src="@/assets/ic_plus_a.svg" alt="">
                 </button>
 
                 <button type="button" class="delete_btn" v-if="coinIndex" @click="deleteCoinInItem(itemIndex, coinIndex)">
                     <img src="@/assets/ic_delete.svg" alt="">
+                    <img src="@/assets/ic_delete_a.svg" alt="">
                 </button>
             </div>
         </div>
@@ -236,7 +239,7 @@
     // Validate address
     function validateAddress(e, itemindex) {
         let address = data.value[itemindex].address,
-            isStartsWith = address.startsWith(store.networks.multisend[store.currentNetwork].prefix)
+            isStartsWith = address.startsWith(store.networks.multisend[store.multisendCurrentNetwork].prefix)
 
         isStartsWith
             ? e.target.classList.remove('error')
@@ -347,7 +350,7 @@
         data.value.push({
             address: !item ? '' : item.Address,
             coins: [{
-                amount: !item ? '' : item.Amount,
+                amount: !item ? '' : item.Amount.toString(),
                 denom: !item ? '' : item.Denom
             }]
         })
@@ -435,7 +438,7 @@
                 text: i18n.global.t('message.notification_failed_validate_desc'),
                 type: 'error',
                 data: {
-                    chain: store.networks.multisend[store.currentNetwork].name
+                    chain: store.networks.multisend[store.multisendCurrentNetwork].name
                 }
             })
 
@@ -493,31 +496,36 @@
                 let validatedData = validateImportData(result.data)
 
                 // Grouping
-                let formattedData = groupingImportData(validatedData)
+                let groupingData = groupingImportData(validatedData)
 
-                // Generate data
-                formattedData.forEach(el => {
-                    let item = data.value.find(item => item.address === el.Address)
+                if (groupingData.length) {
+                    // Generate data
+                    groupingData.forEach(el => {
+                        let item = data.value.find(item => item.address === el.Address)
 
-                    if (item) {
-                        // Add coin to item
-                        data.value[data.value.indexOf(item)].coins.push({
-                            amount: el.Amount,
-                            denom: el.Denom
-                        })
+                        if (item) {
+                            // Add coin to item
+                            data.value[data.value.indexOf(item)].coins.push({
+                                amount: el.Amount.toString(),
+                                denom: el.Denom
+                            })
 
-                        // Push placeholder
-                        placeholders.value[data.value.indexOf(item)].coins.push({
-                            placeholder: '0'
-                        })
-                    } else {
-                        // Add item
-                        addItem(el)
-                    }
-                })
+                            // Push placeholder
+                            placeholders.value[data.value.indexOf(item)].coins.push({
+                                placeholder: '0'
+                            })
+                        } else {
+                            // Add item
+                            addItem(el)
+                        }
+                    })
 
-                // Update placeholders
-                updatePlaceholders()
+                    // Update placeholders
+                    updatePlaceholders()
+                } else {
+                    // Reset data
+                    resetData()
+                }
 
                 // Hide upload modal
                 showUploadModal.value = false
@@ -528,16 +536,44 @@
 
     // Validate import data
     function validateImportData(importData) {
+        // Clear notifications
+        notification.notify({
+            group: 'default',
+            clean: true
+        })
+
         importData.forEach((item, i) => {
             // Validate addresses
             if (!item.Address.length) {
                 importData[i] = null
+
+                // Show error message - Missing Address
+                notification.notify({
+                    group: 'default',
+                    title: i18n.global.t('message.notification_importCSV_error_title'),
+                    text: i18n.global.t('message.notification_importCSV_error_missing_address'),
+                    type: 'error',
+                    data: {
+                        chain: store.networks.multisend[store.multisendCurrentNetwork].name
+                    }
+                })
             } else {
                 // Address prefix
                 let isStartsWith = item.Address.startsWith(store.networks.multisend[store.multisendCurrentNetwork].prefix)
 
                 if (!isStartsWith) {
                     importData[i] = null
+
+                    // Show error message - Invalid Address
+                    notification.notify({
+                        group: 'default',
+                        title: i18n.global.t('message.notification_importCSV_error_title'),
+                        text: i18n.global.t('message.notification_importCSV_error_invalid_address'),
+                        type: 'error',
+                        data: {
+                            chain: store.networks.multisend[store.multisendCurrentNetwork].name
+                        }
+                    })
                 }
             }
 
@@ -545,12 +581,34 @@
             // Validate denom
             if (!item.Denom.length) {
                 importData[i] = null
+
+                // Show error message - Missing Denom
+                notification.notify({
+                    group: 'default',
+                    title: i18n.global.t('message.notification_importCSV_error_title'),
+                    text: i18n.global.t('message.notification_importCSV_error_invalid_denom'),
+                    type: 'error',
+                    data: {
+                        chain: store.networks.multisend[store.multisendCurrentNetwork].name
+                    }
+                })
             } else {
                 // Availability on balance
                 let availability = store.balances.find(balance => balance.denom == item.Denom)
 
                 if (!availability) {
                     importData[i] = null
+
+                    // Show error message - Invalid Denom
+                    notification.notify({
+                        group: 'default',
+                        title: i18n.global.t('message.notification_importCSV_error_title'),
+                        text: i18n.global.t('message.notification_importCSV_error_invalid_denom'),
+                        type: 'error',
+                        data: {
+                            chain: store.networks.multisend[store.multisendCurrentNetwork].name
+                        }
+                    })
                 }
             }
 
@@ -558,28 +616,19 @@
             // Validate amount
             if (parseFloat(item.Amount) <= 0) {
                 importData[i] = null
+
+                // Show error message - Invalid Amount
+                notification.notify({
+                    group: 'default',
+                    title: i18n.global.t('message.notification_importCSV_error_title'),
+                    text: i18n.global.t('message.notification_importCSV_error_invalid_amount'),
+                    type: 'error',
+                    data: {
+                        chain: store.networks.multisend[store.multisendCurrentNetwork].name
+                    }
+                })
             }
         })
-
-
-        // Show error message
-        if (importData.includes(null)) {
-            // Show notification
-            notification.notify({
-                group: 'default',
-                clean: true
-            })
-
-            notification.notify({
-                group: 'default',
-                title: i18n.global.t('message.notification_importCSV_title'),
-                text: i18n.global.t('message.notification_importCSV_desc'),
-                type: 'error',
-                data: {
-                    chain: store.networks.multisend[store.multisendCurrentNetwork].name
-                }
-            })
-        }
 
 
         return importData.filter(item => item !== null)
@@ -735,6 +784,8 @@
         font-size: 20px;
         font-weight: 600;
 
+        position: relative;
+
         display: block;
 
         margin-left: auto;
@@ -744,6 +795,29 @@
                 background-clip: text;
 
         -webkit-text-fill-color: transparent;
+    }
+
+
+    .import_btn:after
+    {
+        position: absolute;
+        bottom: 5px;
+        left: 0;
+
+        width: 0;
+        height: 1px;
+
+        content: '';
+        transition: width .3s linear;
+
+        background: linear-gradient(135deg,  #d57cff 0%,#520c97 100%);
+    }
+
+
+    .import_btn:hover:after,
+    .import_btn.active:after
+    {
+        width: 100%;
     }
 
 
@@ -860,9 +934,23 @@
         width: 100%;
         height: 52px;
 
-        color: #8425da;
+        color: #762cb9;
         border: 2px solid #762cb9;
         border-radius: 14px;
+    }
+
+
+    .add_items .btn:hover
+    {
+        color: #fff;
+        background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
+    }
+
+
+    .add_items .btn:active
+    {
+        color: #fff;
+        background: linear-gradient(334deg, #b96bff 3.94%, #8425da 65.71%, #762cb9 129.3%);
     }
 
 
@@ -900,6 +988,27 @@
     }
 
 
+    .add_btn img + img,
+    .delete_btn img + img
+    {
+        display: none;
+    }
+
+
+    .add_btn:hover img,
+    .delete_btn:hover img
+    {
+        display: none;
+    }
+
+
+    .add_btn:hover img + img,
+    .delete_btn:hover img + img
+    {
+        display: block;
+    }
+
+
 
     .clear_btn
     {
@@ -918,7 +1027,6 @@
         height: 52px;
         margin-left: 22px;
 
-        transition: .2s linear;
         white-space: nowrap;
 
         color: #470072;
@@ -938,10 +1046,10 @@
     }
 
 
-    .clear_btn:hover
+    .clear_btn:hover,
+    .clear_btn:active
     {
         color: #8425da;
         background: #fff;
     }
-
 </style>

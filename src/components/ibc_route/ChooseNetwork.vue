@@ -18,30 +18,32 @@
             <!-- Search -->
             <Search />
 
-            <div class="scroll" v-if="Object.keys(searchResult).length">
-                <div v-for="(network, index) in searchResult" :key="index"
-                    :class="{ favorited: store.IBCRouteFavorites[network.chainId] }"
-                >
-                    <router-link class="network"
-                        :class="{ active: store.IBCRouteCurrentNetwork == network.alias }"
-                        :to="`/ibc_route/${network.alias}`"
-                        @click="showDropdown = !showDropdown"
+            <div class="scroll_wrap" v-if="Object.keys(searchResult).length">
+                <div class="scroll">
+                    <div v-for="(network, index) in searchResult" :key="index"
+                        :class="{ favorited: store.IBCRouteFavorites[network.chainId] }"
                     >
-                        <div class="logo">
-                            <img :src="getNetworkLogo(network.chainId)" alt="" loading="lazy">
-                        </div>
+                        <router-link class="network"
+                            :class="{ active: store.IBCRouteCurrentNetwork == network.alias }"
+                            :to="`/ibc_route/${network.alias}`"
+                            @click="showDropdown = !showDropdown"
+                        >
+                            <div class="logo">
+                                <img :src="getNetworkLogo(network.chainId)" alt="" loading="lazy">
+                            </div>
 
-                        <div>
-                            <div class="name">{{ network.name }}</div>
-                            <div class="token">{{ network.token_name }}</div>
-                        </div>
+                            <div>
+                                <div class="name">{{ network.name }}</div>
+                                <div class="token">{{ network.token_name }}</div>
+                            </div>
 
-                        <button class="favorite_btn" :class="{ active: store.IBCRouteFavorites[network.chainId] }" @click.stop.prevent="toggleFavorite(network.chainId)">
-                            <svg><use xlink:href="@/assets/sprite.svg#ic_favorite"></use></svg>
+                            <button class="favorite_btn" :class="{ active: store.IBCRouteFavorites[network.chainId] }" @click.stop.prevent="toggleFavorite(network.chainId)">
+                                <svg><use xlink:href="@/assets/sprite.svg#ic_favorite"></use></svg>
 
-                            <svg><use xlink:href="@/assets/sprite.svg#ic_favorite_a"></use></svg>
-                        </button>
-                    </router-link>
+                                <svg><use xlink:href="@/assets/sprite.svg#ic_favorite_a"></use></svg>
+                            </button>
+                        </router-link>
+                    </div>
                 </div>
             </div>
 
@@ -101,7 +103,7 @@
 </script>
 
 
-<style>
+<style scoped>
     .choose_network
     {
         position: relative;
@@ -248,39 +250,47 @@
     }
 
 
-    .choose_network .mini_modal .scroll
+    .choose_network .scroll_wrap
+    {
+        overflow: hidden;
+
+        padding-right: 4px;
+
+        border-radius: 20px;
+        background: #141414;
+    }
+
+
+    .choose_network .scroll
     {
         display: flex;
         overflow: auto;
         flex-direction: column;
 
         max-height: 345px;
-        padding: 10px;
-
-        border-radius: 20px;
-        background: #141414;
+        padding: 10px 6px 10px 10px;
 
         overscroll-behavior-y: contain;
     }
 
-    .choose_network .mini_modal .scroll::-webkit-scrollbar
+    .choose_network .scroll::-webkit-scrollbar
     {
         width: 4px;
         height: 4px;
     }
 
 
-    .choose_network .mini_modal .scroll > *
+    .choose_network .scroll > *
     {
         order: 3;
     }
 
-    .choose_network .mini_modal .scroll > *.favorited
+    .choose_network .scroll > *.favorited
     {
         order: 1;
     }
 
-    .choose_network .mini_modal .scroll > * + *
+    .choose_network .scroll > * + *
     {
         margin-top: 5px;
     }

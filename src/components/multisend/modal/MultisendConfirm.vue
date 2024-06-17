@@ -235,7 +235,6 @@
     }
 
 
-
     .list
     {
         margin-top: 20px;
@@ -337,8 +336,6 @@
         margin-top: 20px;
         margin-left: auto;
 
-        transition: .2s linear;
-
         border: 2px solid #762cb9;
         border-radius: 14px;
         background: linear-gradient(329deg, #762cb9 -28.05%, #8425da 32.19%, #b96bff 90.69%);
@@ -347,8 +344,13 @@
 
     .confirm_btn:hover
     {
+        background: linear-gradient(329deg, #b96bff -28.05%, #8425da 30.46%, #762cb9 90.69%);
+    }
+
+
+    .confirm_btn:active
+    {
         color: #8425da;
         background: #fff;
     }
-
 </style>

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useGlobalStore } from '@/stores'
 
 import defaultLayout from '@/layouts/Default.vue'
 
