@@ -169,34 +169,71 @@ export const useGlobalStore = defineStore('global', {
             //     console.error(error)
             // }
 
+            console.log(assets)
+
             // Get balance info
             for (const balance of this.balances) {
                 // Denom traces
                 balance.denom_traces = await denomTraces(balance.denom, currentNetwork)
 
                 if (!balance.denom_traces.ingnoreTraces) {
-                    assets.forEach(chain => {
-                        // Get denom info
-                        let denomInfo = chain.assets.find(token => token.base === balance.denom_traces.base_denom)
+                    let result = null
+
+                    for (let asset of assets) {
+                        let denomInfo = asset.assets.find(token => token.base === balance.denom_traces.base_denom)
 
                         if (denomInfo) {
-                            // Get chain info
-                            let chainInfo = chains.find(chain => chain.pretty_name.charAt(0).toUpperCase() + chain.pretty_name.slice(1) === denomInfo.name)
+                            result = {
+                                denom_info: denomInfo,
+                                chain_name: asset.chain_name
+                            }
 
-                            // Set info
-                            balance.chain_id = chainInfo != undefined ? chainInfo.chain_id : null
-                            balance.base_denom = denomInfo.base
-                            balance.symbol = denomInfo.symbol
-
-                            // Format denom exponent
-                            let formatableToken = this.formatableTokens.find(el => el.tokenName == denomInfo.base.toUpperCase())
-
-                            // Set exponent for denom
-                            formatableToken
-                                ? balance.exponent = formatableToken.exponent
-                                : balance.exponent = denomInfo.denom_units[1]?.exponent || 0
+                            break
                         }
-                    })
+                    }
+
+                    if (result.denom_info) {
+                        // Get chain info
+                        let chainInfo = chains.find(el => el.chain_name === result.chain_name)
+
+                        // Set info
+                        balance.chain_id = chainInfo != undefined ? chainInfo.chain_id : null
+                        balance.base_denom = result.denom_info.base
+                        balance.symbol = result.denom_info.symbol
+
+                        // Format denom exponent
+                        let formatableToken = this.formatableTokens.find(el => el.tokenName == result.denom_info.base.toUpperCase())
+
+                        // Set exponent for denom
+                        formatableToken
+                            ? balance.exponent = formatableToken.exponent
+                            : balance.exponent = result.denom_info.denom_units[1]?.exponent || 0
+                    }
+
+                    // assets.forEach(chain => {
+                    //     // Get denom info
+                    //     let denomInfo = chain.assets.find(token => token.base === balance.denom_traces.base_denom)
+
+                    //     if (denomInfo) {
+                    //         // Get chain info
+                    //         // let chainInfo = chains.find(chain => chain.pretty_name.charAt(0).toUpperCase() + chain.pretty_name.slice(1) === denomInfo.name)
+                    //         let chainInfo = chains.find(el => el.chain_name === chain.chain_name)
+                    //         console.log(chainInfo)
+
+                    //         // Set info
+                    //         balance.chain_id = chainInfo != undefined ? chainInfo.chain_id : null
+                    //         balance.base_denom = denomInfo.base
+                    //         balance.symbol = denomInfo.symbol
+
+                    //         // Format denom exponent
+                    //         let formatableToken = this.formatableTokens.find(el => el.tokenName == denomInfo.base.toUpperCase())
+
+                    //         // Set exponent for denom
+                    //         formatableToken
+                    //             ? balance.exponent = formatableToken.exponent
+                    //             : balance.exponent = denomInfo.denom_units[1]?.exponent || 0
+                    //     }
+                    // })
                 } else {
                     // Get denom info by chain-registry assets
                     try {

@@ -126,24 +126,27 @@
 
     .drag_drop
     {
-        font-size: 24px;
+        font-size: 40px;
         font-weight: 600;
 
-        display: flex;
-        align-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: space-between;
+        position: relative;
 
-        padding: 4px 4px 4px 19px;
+        height: 180px;
+        padding: 43px 7px 7px;
 
-        cursor: move;
         cursor: grab;
+        text-align: center;
 
-        color: #8425da;
+        color: #1b0233;
         border: 1px dashed #8425da;
         border-radius: 30px;
         background: #390469;
+    }
+
+
+    .drag_drop div
+    {
+        pointer-events: none;
     }
 
 
@@ -151,6 +154,10 @@
     {
         font-size: 24px;
         font-weight: 600;
+
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
 
         display: flex;
         align-content: center;
@@ -162,6 +169,7 @@
 
         cursor: pointer;
         transition: .2s linear;
+        transform: translateX(-50%);
 
         color: #fff;
         border-radius: 31px;
