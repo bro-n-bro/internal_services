@@ -169,8 +169,6 @@ export const useGlobalStore = defineStore('global', {
             //     console.error(error)
             // }
 
-            console.log(assets)
-
             // Get balance info
             for (const balance of this.balances) {
                 // Denom traces

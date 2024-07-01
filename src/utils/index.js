@@ -136,15 +136,20 @@ export const getNetworkLogo = chainId => {
         if (chainId === 'space-pussy') {
             logos = store.networks.ibc_recovery.space_pussy.images
         } else {
-            let chain = chains.find(el => el.chain_id === chainId),
-                storeNetwork = chain ? store.networks.global[chain.chain_name] : null
+            let chain = chains.find(el => el.chain_id === chainId)
 
-            storeNetwork && storeNetwork.images
-                ? logos = storeNetwork.images
-                : logos = chain.images
+            if (chain) {
+                let storeNetwork = chain ? store.networks.global[chain.chain_name] : null
+
+                storeNetwork && storeNetwork.images
+                    ? logos = storeNetwork.images
+                    : logos = chain.images
+
+                logos = logos[logos.length - 1].svg ? logos[logos.length - 1].svg : logos[logos.length - 1].png
+            }
         }
 
-        return logos[logos.length - 1].svg ? logos[logos.length - 1].svg : logos[logos.length - 1].png
+        return logos
     }
 }
 

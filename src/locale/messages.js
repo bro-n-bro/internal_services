@@ -35,13 +35,15 @@ export default {
             // IBC route
             'ibc_route_page_title': 'IBC route',
             'ibc_route_empty_title': 'No tokens available',
+
             'ibc_route_return_path_label': 'Return path: {count} chains',
-            'ibc_route_return_path_no_need': "Return path: {count} chains",
             'ibc_route_return_path_chain_name_label': 'Chain name:',
             'ibc_route_return_path_status_verified': 'Verified',
             'ibc_route_return_path_status_broken': 'Broken',
             'ibc_route_return_path_status_expired': 'Expired',
+
             'ibc_route_path_label': 'Path:',
+            'ibc_route_path_no_need': 'No need, it’s a native token.',
 
 
             // Search
@@ -97,6 +99,9 @@ export default {
             'notification_importCSV_error_invalid_denom': 'Invalid denom.',
 
             'notification_importCSV_error_invalid_amount': 'Invalid amount value.',
+
+            'notification_copy_title': 'Copy successful',
+            'notification_copy_desc': 'The path has been copied to the clipboard.',
 
             'notification_tx_error_2': "tx parse error",
             'notification_tx_error_3': "invalid sequence",
