@@ -82,6 +82,7 @@
 
             chainIDs.forEach(chainId => {
                 // Get network config
+                console.log(chainId)
                 chainId === 'space-pussy'
                     ? networkConfig = store.networks.ibc_recovery.space_pussy
                     : networkConfig = chains.find(chain => chain.chain_id === chainId)
