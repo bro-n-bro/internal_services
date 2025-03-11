@@ -87,6 +87,8 @@
                     ? networkConfig = store.networks.ibc_recovery.space_pussy
                     : networkConfig = chains.find(chain => chain.chain_id === chainId)
 
+                console.log(networkConfig)
+
                 // Set data
                 if (!networks.value.find(el => el.chain_id === networkConfig.chain_id)) {
                     networks.value.push(networkConfig)
