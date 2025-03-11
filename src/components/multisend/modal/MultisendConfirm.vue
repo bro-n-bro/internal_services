@@ -24,7 +24,8 @@
                             </div>
 
                             <div class="val">
-                                {{ item.address.slice(0, 9) + '...' + item.address.slice(-6) }}</div>
+                                {{ item.address.slice(0, 9) + '...' + item.address.slice(-6) }}
+                            </div>
                         </div>
 
                         <div class="coins">
@@ -152,6 +153,7 @@
                     outputs
                 }
             }
+
 
             // Send Tx
             let result = await sendTx([msgAny], store.currentNetwork)
